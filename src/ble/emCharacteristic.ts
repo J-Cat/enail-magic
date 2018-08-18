@@ -20,6 +20,10 @@ import { SimpleEventDispatcher, ISimpleEvent } from 'ste-simple-events';
 import { BlenoResult } from './BlenoResult';
 import { App } from '../app';
 
+const EM_FROMSERVER_DATA: string = 'EM/FROMSERVER/DATA';
+const EM_FROMCLIENT_SETPROFILE: string = 'EM/FROMCLIENT/SETPROFILE';
+const EM_FROMCLIENT_SETSTATUS: string = 'EM/FROMCLIENT/SETSTATUS';
+
 export const UUID: string = "7475AB88-90C4-4A98-A95E-19D5CAB55EEB";
 
 export class EMCharacteristic extends Characteristic {
@@ -61,7 +65,7 @@ export class EMCharacteristic extends Characteristic {
             this.updateValueCallback(
                 new Buffer(
                     JSON.stringify({
-                        type: 'BROADCAST_DATA', 
+                        type: 'EM/FROMSERVER/UPDATEDATA', 
                         data: {
                             temperature: this.app.temperature,
                             status: this.app.currentProfile.running,
@@ -104,12 +108,12 @@ export class EMCharacteristic extends Characteristic {
 
         const action: { type: string, value: number | boolean } = JSON.parse(data.toString());
         switch (action.type) {
-            case 'SET_PROFILE': {
+            case EM_FROMCLIENT_SETPROFILE: {
                 this._onChangeProfile.dispatch(action.value as number);
                 break;
             }
 
-            case 'SET_STATUS': {
+            case EM_FROMCLIENT_SETSTATUS: {
                 this._onChangeStatus.dispatch(action.value as boolean);
                 break;
             }

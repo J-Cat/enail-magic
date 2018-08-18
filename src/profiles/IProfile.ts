@@ -1,27 +1,27 @@
 export interface IProfile {
     readonly title: string;
-    readonly steps: Array<IStep & (ITemperatureStep & ITimeStep & ISwitchStep & ILEDStep)>;
+    readonly steps: Array<ITemperatureStep | ITimeStep | ISwitchStep | ILEDStep>;
 }
 
 export interface IStep {
     readonly type: string;
 }
 
-export interface ITemperatureStep {
+export interface ITemperatureStep extends IStep {
     readonly temperature: number;
     readonly direction: number;
     readonly timeout: number;
 }
 
-export interface ITimeStep {
+export interface ITimeStep extends IStep {
     readonly delay: number;
 }
 
-export interface ISwitchStep {
+export interface ISwitchStep extends IStep {
     readonly onoff: number;
 }
 
-export interface ILEDStep {
+export interface ILEDStep extends IStep {
     readonly r: number;
     readonly g: number;
     readonly b: number;

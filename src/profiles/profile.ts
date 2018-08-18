@@ -1,5 +1,5 @@
 import { Step, TemperatureStep, TimeStep, SwitchStep, LEDStep } from "./steps";
-import { IProfile } from "./IProfile";
+import { IProfile, ISwitchStep, ITimeStep, ITemperatureStep, ILEDStep } from "./IProfile";
 import { EventDispatcher, IEvent } from "ste-events";
 import { SimpleEventDispatcher, ISimpleEvent } from "strongly-typed-events";
 import { App } from "../app";
@@ -40,19 +40,21 @@ export class Profile {
         this.steps = profile.steps.map(value => {
             switch (value.type.toLowerCase()) {
                 case "switch": {
-                    return new SwitchStep(this, value.onoff);
+                    return new SwitchStep(this, (value as ISwitchStep).onoff);
                 }
 
                 case "time": {
-                    return new TimeStep(this, value.delay);
+                    return new TimeStep(this, (value as ITimeStep).delay);
                 }
 
                 case "temperature": {
-                    return new TemperatureStep(this, value.temperature, value.direction);
+                    const tempStepValue: ITemperatureStep = value as ITemperatureStep;
+                    return new TemperatureStep(this, tempStepValue.temperature, tempStepValue.direction);
                 }
 
                 case "led": {
-                    return new LEDStep(this, value.r, value.g, value.b, value.flashSpeed);
+                    const ledStepValue: ILEDStep = value as ILEDStep;
+                    return new LEDStep(this, ledStepValue.r, ledStepValue.g, ledStepValue.b, ledStepValue.flashSpeed);
                 }
 
                 default: {
