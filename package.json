@@ -4,7 +4,9 @@
   "description": "e-Nail Magic - Add Magic to your e-Nail!",
   "main": "app.js",
   "dependencies": {
+    "bleno": "^0.5.0",
     "blessed": "^0.1.81",
+    "lodash.throttle": "^4.1.1",
     "onoff": "^3.2.1",
     "raspi": "^5.0.2",
     "raspi-gpio": "^6.0.0",
@@ -14,8 +16,10 @@
     "util": "^0.11.0"
   },
   "devDependencies": {
+    "@types/bleno": "^0.4.1",
     "@types/blessed": "^0.1.10",
     "@types/core-js": "^2.5.0",
+    "@types/lodash.throttle": "^4.1.4",
     "@types/node": "^10.7.0",
     "@types/onoff": "0.0.28",
     "@types/raspi": "^5.0.0",

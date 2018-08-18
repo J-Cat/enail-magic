@@ -102,6 +102,10 @@ export class Profile {
     }
 
     nextStep = (step: Step) => {
+        if (!this.running) {
+            return;
+        }
+        
         this._onNextStep.dispatch(this);
         this.steps[this.currentIndex].onEnd.unsubscribe(this.nextStep);
         this.currentIndex = this.currentIndex + 1;

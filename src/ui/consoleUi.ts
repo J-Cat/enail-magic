@@ -1,6 +1,7 @@
 import * as  Blessed from "blessed";
 import { Profile } from "../profiles/profile";
 import { App } from "../app";
+import { TemperatureStep } from "../profiles";
 export class ConsoleUi {
     private screen: Blessed.Widgets.Screen;
     private box: Blessed.Widgets.BoxElement;
@@ -11,7 +12,7 @@ export class ConsoleUi {
 
         this.screen = Blessed.screen({
             smartCSR: true,
-
+            fullUnicode: true
         });
         this.screen.enableInput();    
 
@@ -37,7 +38,16 @@ export class ConsoleUi {
         this.box.focus();
 
         this.render();
-      }
+    }
+
+    getStepString: () => string = () => {
+        const s: string = this._app.currentProfile.steps[this._app.currentProfile.currentIndex].getText();
+        if (s !== "") {
+            return s;
+        } else {
+            return `${this._app.currentProfile.currentIndex}`;
+        }
+    };
 
     render: () => void = () => {
         this.box.setContent(
@@ -46,7 +56,7 @@ export class ConsoleUi {
             + `${this._app.currentProfile.running ? '{/red-fg}\n' : '\n'}`
             + `${!!this._app.temperature ? this._app.temperature : ''}`
             + (this._app.currentProfile.running 
-                ? '{|}{red-fg}' + `${this._app.currentProfile.currentIndex + 1}` + '{/red-fg}' 
+                ? '{|}{red-fg}' + this.getStepString() + '{/red-fg}' 
                 : ''
             )
         );

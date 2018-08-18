@@ -1,8 +1,9 @@
-import { IProfile } from "./IProfile";
 import { Profile } from "./profile";
 import { App } from "../app";
 
+import { IProfile } from "./IProfile";
 const _profiles: Array<IProfile> = require("./profiles.json");
+
 let index: number = 1;
 
 export class Profiles {

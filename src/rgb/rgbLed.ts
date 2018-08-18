@@ -79,7 +79,7 @@ export class RgbLed {
         this.g = g;
         this.b = b;
         this.flashSpeed = flashSpeed;
-        this.flash(count, 1);
+        this.flash(count, 0);
     }
 
     off = () => {

@@ -13,6 +13,8 @@ export abstract class Step {
 
     abstract run: () => void;
 
+    abstract getText: () => string;
+
     get onEnd(): ISimpleEvent<Step> {
         return this._onEnd.asEvent();
     }
@@ -27,6 +29,10 @@ export class TimeStep extends Step {
         super(profile);
 
         this._delay = delay;
+    }
+
+    getText = (): string => {
+        return "\u{0023F0}";
     }
 
     run = () => {
@@ -48,6 +54,10 @@ export class TemperatureStep extends Step {
         this._temperature = temperature;
         this._direction = direction;
         this._timeout = timeout;
+    }
+
+    getText = (): string => {
+        return `\u{01F321}${this._direction === 1 ? '\u{002191}' : '\u{002193}'}`;
     }
 
     run = () => {
@@ -94,6 +104,10 @@ export class TemperatureStep extends Step {
 export class SwitchStep extends Step {
     private _onoff: number;
 
+    getText = (): string => {
+        return "\u{0023FC}";
+    }
+
     run = () => {
         this._profile.app.switchHeater(this._onoff);
         this._onEnd.dispatch(this);
@@ -119,6 +133,10 @@ export class LEDStep extends Step {
         this.g = g;
         this.b = b;
         this.flashSpeed = flashSpeed;
+    }
+
+    getText = (): string => {
+        return "\u{01F4A1}";
     }
 
     run = () => {

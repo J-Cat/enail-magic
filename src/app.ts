@@ -8,18 +8,21 @@ import { ConsoleUi } from "./ui/consoleUi";
 import { RotaryDial } from "./ui/rotaryDial";
 import { RgbLed } from "./rgb";
 
+import { EMService } from "./ble/emService";
+
 export class App {
-    private _profileIndex: number = 0;
     private consoleUi: ConsoleUi;
     private dial: RotaryDial;
     private heater: DigitalOutput | undefined;
     private profiles: Profiles = new Profiles(this);
     private rgbLed: RgbLed;
+    private emService: EMService;
+    profileIndex: number = 0;
     temperature: number = 0;
 
     get currentProfile(): Profile {
-        if (this._profileIndex < this.profiles.items.length) {
-            return this.profiles.items[this._profileIndex];
+        if (this.profileIndex < this.profiles.items.length) {
+            return this.profiles.items[this.profileIndex];
         } else {
             throw new Error("Profile index is out of range!");
         }
@@ -36,6 +39,8 @@ export class App {
         this.profiles.items.forEach((profile) => {
             profile.temperature = this.temperature;
         });
+
+        this.emService.sendData();
         this.consoleUi.render();
     };
 
@@ -44,12 +49,14 @@ export class App {
             return;
         }
 
-        this._profileIndex += 1;
-        if (this._profileIndex >= this.profiles.items.length) {
-            this._profileIndex = 0;
+        this.profileIndex += 1;
+        if (this.profileIndex >= this.profiles.items.length) {
+            this.profileIndex = 0;
         }
 
-        this.rgbLed.flashOn(0, 0, 25, 0.25, this.currentProfile.profileIndex + 1);
+        this.rgbLed.flashOn(0, 0, 25, 0.25, this.profileIndex + 1);
+
+        this.emService.sendData();
         this.consoleUi.render();
     }
 
@@ -58,12 +65,14 @@ export class App {
             return;
         }
 
-        this._profileIndex -= 1;
-        if (this._profileIndex < 0) {
-            this._profileIndex = this.profiles.items.length - 1;
+        this.profileIndex -= 1;
+        if (this.profileIndex < 0) {
+            this.profileIndex = this.profiles.items.length - 1;
         }
 
-        this.rgbLed.flashOn(0, 0, 25, 0.25, this.currentProfile.profileIndex + 1);
+        this.rgbLed.flashOn(0, 0, 25, 0.25, this.profileIndex + 1);
+
+        this.emService.sendData();
         this.consoleUi.render();
     }
 
@@ -78,15 +87,33 @@ export class App {
             this.currentProfile.onNextStep.subscribe(this.onNextStep);
 
             this.currentProfile.run();
+
+            this.emService.sendData();
             this.consoleUi.render();
         } else {
             this.currentProfile.abort();
+
+            this.emService.sendData();
             this.consoleUi.render();
         }
     }
 
     onNextStep: (profile: Profile) => void = (profile: Profile) => {
+        this.emService.sendData();
         this.consoleUi.render();
+    }
+
+    onBleChangeProfile: (index: number) => void = (index: number) => {
+        if (this.currentProfile.running || index === this.profileIndex) {
+            return;
+        }
+
+        if (index >= 0 && index < this.profiles.items.length) {
+            this.profileIndex = index;
+
+            this.rgbLed.flashOn(0, 0, 25, 0.25, this.profileIndex + 1);
+            this.consoleUi.render();
+        }
     }
 
     switchHeater: (onoff: number) => void = (onoff: number) => {
@@ -134,6 +161,10 @@ export class App {
             });
             this.switchHeater(1);
         });
+
+        this.emService = new EMService(this);
+        this.emService.onChangeProfile.subscribe(this.onBleChangeProfile);
+        this.emService.sendData();
 
         this.consoleUi = new ConsoleUi(this);
         this.consoleUi.render();
