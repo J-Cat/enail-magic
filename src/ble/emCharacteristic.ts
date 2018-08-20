@@ -14,15 +14,12 @@
  * Copyright (c) 2018
  */
 import { Characteristic, Descriptor } from 'bleno';
-import { throttle } from "lodash";
 import { SimpleEventDispatcher, ISimpleEvent } from 'ste-simple-events';
 
 import { BlenoResult } from './BlenoResult';
 import { App } from '../app';
 
-const EM_FROMSERVER_DATA: string = 'EM/FROMSERVER/DATA';
-const EM_FROMCLIENT_SETPROFILE: string = 'EM/FROMCLIENT/SETPROFILE';
-const EM_FROMCLIENT_SETSTATUS: string = 'EM/FROMCLIENT/SETSTATUS';
+import * as EMConstants from './constants';
 
 export const UUID: string = "7475AB88-90C4-4A98-A95E-19D5CAB55EEB";
 
@@ -61,21 +58,26 @@ export class EMCharacteristic extends Characteristic {
     }
 
     public onNotify() {
-        if (this.updateValueCallback !== null) {            
-            this.updateValueCallback(
-                new Buffer(
-                    JSON.stringify({
-                        type: 'EM/FROMSERVER/UPDATEDATA', 
-                        data: {
-                            temperature: this.app.temperature,
-                            status: this.app.currentProfile.running,
-                            profileIndex: this.app.profileIndex,
-                            stepIndex: this.app.currentProfile.running ? this.app.currentProfile.currentIndex : 0
-                        }
-                    })
-                )
-            );
-        }    
+        setTimeout(() => 
+            {
+                if (this.updateValueCallback !== null) {            
+                    this.updateValueCallback(
+                        new Buffer(
+                            JSON.stringify({
+                                type: EMConstants.EM_FROMSERVER_DATA, 
+                                data: {
+                                    temperature: this.app.temperature,
+                                    status: this.app.currentProfile.running,
+                                    profileIndex: this.app.profileIndex,
+                                    stepIndex: this.app.currentProfile.running ? this.app.currentProfile.currentIndex : 0
+                                }
+                            })
+                        )
+                    );
+                }
+            },
+            0
+        );
     }
     public onSubscribe(maxValueSize: number, updateValueCallback: (value: Buffer) => void) {
         this.updateValueCallback = updateValueCallback;
@@ -108,12 +110,12 @@ export class EMCharacteristic extends Characteristic {
 
         const action: { type: string, value: number | boolean } = JSON.parse(data.toString());
         switch (action.type) {
-            case EM_FROMCLIENT_SETPROFILE: {
+            case EMConstants.EM_FROMCLIENT_SETPROFILE: {
                 this._onChangeProfile.dispatch(action.value as number);
                 break;
             }
 
-            case EM_FROMCLIENT_SETSTATUS: {
+            case EMConstants.EM_FROMCLIENT_SETSTATUS: {
                 this._onChangeStatus.dispatch(action.value as boolean);
                 break;
             }

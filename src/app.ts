@@ -10,8 +10,10 @@ import { RgbLed } from "./rgb";
 
 import { EMService } from "./ble/emService";
 
+const isHeaterNC: boolean = true;
+
 export class App {
-    private consoleUi: ConsoleUi;
+    private consoleUi: { render: () => void };
     private dial: RotaryDial;
     private heater: DigitalOutput | undefined;
     private profiles: Profiles = new Profiles(this);
@@ -118,7 +120,7 @@ export class App {
 
     switchHeater: (onoff: number) => void = (onoff: number) => {
         if (!!this.heater) {
-            this.heater.write(onoff);
+            this.heater.write(isHeaterNC ? onoff === 0 ? 1 : 0: onoff);
         }
     }
 
@@ -167,6 +169,9 @@ export class App {
         this.emService.sendData();
 
         this.consoleUi = new ConsoleUi(this);
+        // this.consoleUi = {
+        //     render: () => {}
+        // };
         this.consoleUi.render();
     }
 }
