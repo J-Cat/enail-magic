@@ -1,6 +1,7 @@
 import { IEvent, SimpleEventDispatcher, ISimpleEvent } from "strongly-typed-events";
 import { Profile } from "./profile";
 import { RgbLed } from "../rgb";
+import Icons from '../ui/icons';
 
 export abstract class Step {
     _profile: Profile;
@@ -141,6 +142,27 @@ export class LEDStep extends Step {
 
     run = () => {
         this._profile.app.emitColor(this.r, this.g, this.b, this.flashSpeed);
+        this._onEnd.dispatch(this);
+    }
+}
+
+export class IconStep extends Step {
+    icon: Uint8Array;
+    flashSpeed: number;
+    
+    constructor(profile: Profile, icon: string, flashSpeed: number) {
+        super(profile);
+
+        this.icon = Icons.getIconByName(icon);
+        this.flashSpeed = flashSpeed;
+    }
+
+    getText = (): string => {
+        return "\u{01F4A1}";
+    }
+
+    run = () => {
+        this._profile.app.setIcon(this.icon, this.flashSpeed);
         this._onEnd.dispatch(this);
     }
 }

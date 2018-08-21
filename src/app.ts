@@ -1,4 +1,6 @@
 import * as util from "util";
+import * as fs from 'fs';
+import * as path from 'path';
 import { init } from "raspi";
 import { DigitalInput, DigitalOutput, PULL_UP } from "raspi-gpio";
 
@@ -9,11 +11,14 @@ import { RotaryDial } from "./ui/rotaryDial";
 import { RgbLed } from "./rgb";
 
 import { EMService } from "./ble/emService";
+import { OledUi } from "./ui/oledUi";
+import Icons from "./ui/icons";
 
 const isHeaterNC: boolean = true;
 
 export class App {
     private consoleUi: { render: () => void };
+    private oledUi: OledUi;
     private dial: RotaryDial;
     private heater: DigitalOutput | undefined;
     private profiles: Profiles = new Profiles(this);
@@ -21,12 +26,24 @@ export class App {
     private emService: EMService;
     profileIndex: number = 0;
     temperature: number = 0;
+    temperatureDecimals: number = 0;
+    temperatureShift: number = 0;
 
     get currentProfile(): Profile {
         if (this.profileIndex < this.profiles.items.length) {
             return this.profiles.items[this.profileIndex];
         } else {
             throw new Error("Profile index is out of range!");
+        }
+    }
+
+    setProfile(index: number) {
+        if (index >= 0 && index < this.profiles.items.length) {
+            this.profileIndex = index;
+
+            fs.writeFile(path.resolve('~/.enailmagic'), this.profileIndex, (error) => {});
+            //this.rgbLed.flashOn(0, 0, 25, 0.25, this.profileIndex + 1);
+            this.render();
         }
     }
 
@@ -37,13 +54,13 @@ export class App {
         }
 
         // store temperature to 1 decimal place
-        this.temperature = Math.round(value * 10) / 10;
+        const roundingNumber: number = Math.pow(10, this.temperatureDecimals);
+        this.temperature = (Math.round(value * roundingNumber) / roundingNumber) + this.temperatureShift;
         this.profiles.items.forEach((profile) => {
             profile.temperature = this.temperature;
         });
 
-        this.emService.sendData();
-        this.consoleUi.render();
+        this.render();
     };
 
     onClockwise: (source: RotaryDial) => void = (source: RotaryDial) => {
@@ -51,15 +68,12 @@ export class App {
             return;
         }
 
-        this.profileIndex += 1;
-        if (this.profileIndex >= this.profiles.items.length) {
-            this.profileIndex = 0;
+        let newIndex: number = this.profileIndex + 1;
+        if (newIndex >= this.profiles.items.length) {
+            newIndex = 0;
         }
 
-        this.rgbLed.flashOn(0, 0, 25, 0.25, this.profileIndex + 1);
-
-        this.emService.sendData();
-        this.consoleUi.render();
+        this.setProfile(newIndex);
     }
 
     onCounterClockwise: (source: RotaryDial) => void = (source: RotaryDial) => {
@@ -67,21 +81,19 @@ export class App {
             return;
         }
 
-        this.profileIndex -= 1;
-        if (this.profileIndex < 0) {
-            this.profileIndex = this.profiles.items.length - 1;
+        let newIndex: number = this.profileIndex - 1;
+        if (newIndex < 0) {
+            newIndex = this.profiles.items.length - 1;
         }
 
-        this.rgbLed.flashOn(0, 0, 25, 0.25, this.profileIndex + 1);
-
-        this.emService.sendData();
-        this.consoleUi.render();
+        this.setProfile(newIndex);
     }
 
     onButton: (source: RotaryDial) => void = (source: RotaryDial) => {
         if (!this.currentProfile.running) {
             this.currentProfile.onEnd.one((profile: Profile) => {
                 this.currentProfile.onNextStep.unsubscribe(this.onNextStep);
+                this.oledUi.setIcon(Icons.home, 0);
                 this.rgbLed.off();
                 this.switchHeater(1);
             });
@@ -90,19 +102,16 @@ export class App {
 
             this.currentProfile.run();
 
-            this.emService.sendData();
-            this.consoleUi.render();
+            this.render();
         } else {
             this.currentProfile.abort();
 
-            this.emService.sendData();
-            this.consoleUi.render();
+            this.render();
         }
     }
 
     onNextStep: (profile: Profile) => void = (profile: Profile) => {
-        this.emService.sendData();
-        this.consoleUi.render();
+        this.render();
     }
 
     onBleChangeProfile: (index: number) => void = (index: number) => {
@@ -110,12 +119,7 @@ export class App {
             return;
         }
 
-        if (index >= 0 && index < this.profiles.items.length) {
-            this.profileIndex = index;
-
-            this.rgbLed.flashOn(0, 0, 25, 0.25, this.profileIndex + 1);
-            this.consoleUi.render();
-        }
+        this.setProfile(index);
     }
 
     switchHeater: (onoff: number) => void = (onoff: number) => {
@@ -128,10 +132,22 @@ export class App {
         this.rgbLed.on(r, g, b, flashSpeed);
     }
 
+    setIcon: (icon: Uint8Array, flashSpeed: number) => void = (icon: Uint8Array, flashSpeed: number) => {
+        this.oledUi.setIcon(icon, flashSpeed);
+    }
+
     // cleanup
     cleanup: () => void = () => {
+        fs.writeFile(path.resolve('~/.enailmagic'), this.profileIndex, (error) => {});
         this.switchHeater(1);
+        this.oledUi.stop();
     };
+
+    render() {
+        this.emService.sendData();
+        this.oledUi.render();
+        this.consoleUi.render();
+    }
 
     constructor() {      
         // capture process termination to ensure cleanup
@@ -157,6 +173,18 @@ export class App {
         this.rgbLed = new RgbLed('GPIO18', 'GPIO15', 'GPIO14');
         this.rgbLed.off();        
 
+        fs.readFile(path.resolve('./settings.txt'), (error, data) => {
+            if (!!error) {
+                console.log(error.message);
+            } else {
+                try {
+                    this.profileIndex = parseInt(data.toString(), 10);
+                } catch (e) {
+                    this.profileIndex = 0;
+                }
+            }
+        });
+
         init(() => {
             this.heater = new DigitalOutput({
                 pin: 'GPIO12'
@@ -168,11 +196,12 @@ export class App {
         this.emService.onChangeProfile.subscribe(this.onBleChangeProfile);
         this.emService.sendData();
 
-        this.consoleUi = new ConsoleUi(this);
-        // this.consoleUi = {
-        //     render: () => {}
-        // };
-        this.consoleUi.render();
+        this.oledUi = new OledUi(0x3C, this);
+
+//        this.consoleUi = new ConsoleUi(this);
+        this.consoleUi = {
+            render: () => {}
+        };
     }
 }
 

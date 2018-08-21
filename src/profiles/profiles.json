@@ -1,13 +1,18 @@
 [
     {
-        "title": "Up-Temp 75",
+        "title": "Up-temp 75",
         "steps": [
+            {
+                "type": "icon",
+                "icon": "thermometerDown",
+                "flashRate": 0
+            },
             {
                 "type": "led",
                 "r": 25,
                 "g": 0,
                 "b": 0,
-                "flashSpeed": 1
+                "flashSpeed": 0
             },
             {
                 "type": "switch",
@@ -18,6 +23,11 @@
                 "temperature": -75,
                 "direction": 0,
                 "timeout": 60
+            },
+            {
+                "type": "icon",
+                "icon": "drop",
+                "flashRate": 1000
             },
             {
                 "type": "led",
@@ -41,10 +51,15 @@
                 "onoff": 0
             },
             {
+                "type": "icon",
+                "icon": "drop",
+                "flashRate": 0
+            },
+            {
                 "type": "led",
-                "r": 25,
-                "g": 5,
-                "b": 0,
+                "r": 0,
+                "g": 0,
+                "b": 25,
                 "flashSpeed": 0
             },
             {
@@ -56,6 +71,18 @@
                 "temperature": -35,
                 "direction": 0,
                 "timeout": 60
+            },
+            {
+                "type": "icon",
+                "icon": "cloud",
+                "flashRate": 0
+            },
+            {
+                "type": "led",
+                "r": 25,
+                "g": 0,
+                "b": 0,
+                "flashSpeed": 0
             },
             {
                 "type": "time",
@@ -72,10 +99,15 @@
                 "onoff": 1
             },
             {
+                "type": "icon",
+                "icon": "drop",
+                "flashRate": 1000
+            },
+            {
                 "type": "led",
-                "r": 25,
-                "g": 5,
-                "b": 0,
+                "r": 0,
+                "g": 0,
+                "b": 25,
                 "flashSpeed": 1
             },
             {
@@ -83,6 +115,11 @@
                 "temperature": 0,
                 "direction": 1,
                 "timeout": 60
+            },
+            {
+                "type": "icon",
+                "icon": "cloud",
+                "flashRate": 0
             },
             {
                 "type": "led",
@@ -98,14 +135,19 @@
         ]
     },
     {
-        "title": "Up-Temp 95",
+        "title": "Up Temp95",
         "steps": [
+            {
+                "type": "icon",
+                "icon": "thermometerDown",
+                "flashRate": 0
+            },
             {
                 "type": "led",
                 "r": 25,
                 "g": 0,
                 "b": 0,
-                "flashSpeed": 1
+                "flashSpeed": 0
             },
             {
                 "type": "switch",
@@ -116,6 +158,11 @@
                 "temperature": -95,
                 "direction": 0,
                 "timeout": 60
+            },
+            {
+                "type": "icon",
+                "icon": "drop",
+                "flashRate": 1000
             },
             {
                 "type": "led",
@@ -135,10 +182,15 @@
                 "timeout": 60
             },
             {
+                "type": "icon",
+                "icon": "drop",
+                "flashRate": 0
+            },
+            {
                 "type": "led",
-                "r": 25,
-                "g": 5,
-                "b": 0,
+                "r": 0,
+                "g": 0,
+                "b": 25,
                 "flashSpeed": 0
             },
             {
@@ -148,6 +200,18 @@
             {
                 "type": "time",
                 "delay": 10
+            },
+            {
+                "type": "icon",
+                "icon": "cloud",
+                "flashRate": 0
+            },
+            {
+                "type": "led",
+                "r": 25,
+                "g": 0,
+                "b": 0,
+                "flashSpeed": 0
             },
             {
                 "type": "temperature",
@@ -170,10 +234,15 @@
                 "onoff": 1
             },
             {
+                "type": "icon",
+                "icon": "drop",
+                "flashRate": 1000
+            },
+            {
                 "type": "led",
-                "r": 25,
-                "g": 5,
-                "b": 0,
+                "r": 0,
+                "g": 0,
+                "b": 25,
                 "flashSpeed": 1
             },
             {
@@ -181,6 +250,20 @@
                 "temperature": 0,
                 "direction": 1,
                 "timeout": 60
+            },
+            {
+                "type": "icon",
+                "icon": "cloud",
+                "flashRate": 1000
+            },
+            {
+                "type": "time",
+                "delay": 5
+            },
+            {
+                "type": "icon",
+                "icon": "cloud",
+                "flashSpeed": 0
             },
             {
                 "type": "led",
@@ -199,6 +282,11 @@
         "title": "V-ROD",
         "steps": [
             {
+                "type": "icon",
+                "icon": "drop",
+                "flashRate": 1000
+            },
+            {
                 "type": "led",
                 "r": 0,
                 "g": 0,
@@ -216,6 +304,11 @@
                 "timeout": 60
             },
             {
+                "type": "icon",
+                "icon": "drop",
+                "flashRate": 0
+            },
+            {
                 "type": "led",
                 "r": 0,
                 "g": 0,
@@ -224,17 +317,38 @@
             },
             {
                 "type": "time",
-                "delay": 10
+                "delay": 5
             },
             {
-                "type": "switch",
-                "onoff": 1
+                "type": "icon",
+                "icon": "cloud",
+                "flashRate": 0
             },
             {
                 "type": "led",
                 "r": 25,
                 "g": 0,
                 "b": 0,
+                "flashSpeed": 0
+            },
+            {
+                "type": "time",
+                "delay": 5
+            },
+            {
+                "type": "switch",
+                "onoff": 1
+            },
+            {
+                "type": "icon",
+                "icon": "drop",
+                "flashRate": 1000
+            },
+            {
+                "type": "led",
+                "r": 0,
+                "g": 0,
+                "b": 25,
                 "flashSpeed": 1
             },
             {
@@ -242,6 +356,20 @@
                 "temperature": 0,
                 "direction": 1,
                 "timeout": 60
+            },
+            {
+                "type": "icon",
+                "icon": "cloud",
+                "flashRate": 1000
+            },
+            {
+                "type": "time",
+                "delay": 5
+            },
+            {
+                "type": "icon",
+                "icon": "cloud",
+                "flashSpeed": 0
             },
             {
                 "type": "led",
@@ -254,6 +382,6 @@
                 "type": "time",
                 "delay": 10
             }
-        ]
+       ]
     }
 ]

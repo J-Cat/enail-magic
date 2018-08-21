@@ -1,5 +1,5 @@
-import { Step, TemperatureStep, TimeStep, SwitchStep, LEDStep } from "./steps";
-import { IProfile, ISwitchStep, ITimeStep, ITemperatureStep, ILEDStep } from "./IProfile";
+import { Step, TemperatureStep, TimeStep, SwitchStep, LEDStep, IconStep } from "./steps";
+import { IProfile, ISwitchStep, ITimeStep, ITemperatureStep, ILEDStep, IIconStep } from "./IProfile";
 import { EventDispatcher, IEvent } from "ste-events";
 import { SimpleEventDispatcher, ISimpleEvent } from "strongly-typed-events";
 import { App } from "../app";
@@ -57,8 +57,13 @@ export class Profile {
                     return new LEDStep(this, ledStepValue.r, ledStepValue.g, ledStepValue.b, ledStepValue.flashSpeed);
                 }
 
+                case "icon": {
+                    const iconStepValue: IIconStep = value as IIconStep;
+                    return new IconStep(this, iconStepValue.icon, iconStepValue.flashRate);
+                }
+
                 default: {
-                    throw new Error("Invalid step type specified in profile!");
+                    throw new Error(`Invalid step type specified in profile! ${JSON.stringify(value)}`);
                 }
             }
         });
