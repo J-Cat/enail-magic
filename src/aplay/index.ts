@@ -61,6 +61,9 @@ export default class APlay extends EventEmitter {
             args = args.concat(['-c ' + this.ch]);
         }
 
+        if (args.length > 0) {
+            console.log(args[args.length-1]);
+        }
         args = args.concat([`${!!this.options.basePath ? this.options.basePath : ''}${this.fileName}`]);
         this.process = spawn(aplayExec, args);
 

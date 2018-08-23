@@ -84,19 +84,21 @@ export class EMCharacteristic extends Characteristic {
         setTimeout(() => 
             {
                 if (this.updateValueCallback !== null) {            
-                    const result: number[] = [
-                        this.app.temperature, 
-                        this.app.currentProfile.running ? 1 : 0, 
-                        this.app.profileIndex, 
-                        this.app.currentProfile.currentIndex
-                    ];  
+                    const type: string = `0${EMConstants.EM_FROMSERVER_DATA.toString(16)}`.slice(-2);
+                    const result: { type: string, data: number[] } = {
+                        type: `0x${type}`,
+                        data: [
+                            this.app.temperature, 
+                            this.app.currentProfile.running ? 1 : 0, 
+                            this.app.profileIndex, 
+                            this.app.currentProfile.currentIndex
+                        ]
+                    };  
 
-                    if (this.isChanged(result)) {
+                    if (this.isChanged(result.data)) {
+                        console.log(JSON.stringify(result));
                         this.updateValueCallback(
-                            new Buffer(JSON.stringify({
-                                type: EMConstants.EM_FROMSERVER_DATA, 
-                                data: result
-                            }))
+                            new Buffer(JSON.stringify(result))
                         );
                     }
                 }
@@ -127,8 +129,9 @@ export class EMCharacteristic extends Characteristic {
             this.app.currentProfile.currentIndex
         ];  
 
+        const type: string = `0${EMConstants.EM_FROMSERVER_DATA.toString(16)}`.slice(-2);
         callback(BlenoResult.RESULT_SUCCESS, new Buffer(JSON.stringify({
-            type: EMConstants.EM_FROMSERVER_DATA, 
+            type: `0x${type}`, 
             data: result
         })));
 }
@@ -139,7 +142,7 @@ export class EMCharacteristic extends Characteristic {
             return;
         }
 
-        const action: number[] = JSON.parse(data.toString('base'));
+        const action: number[] = JSON.parse(data.toString());
         switch (action[0]) {
             case EMConstants.EM_FROMCLIENT_SETPROFILE: {
                 this._onChangeProfile.dispatch(action[1] as number);

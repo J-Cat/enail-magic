@@ -66,18 +66,19 @@ export class ProfilesCharacteristic extends Characteristic {
                 const chunk: string = this.profileBase64.substr(this.position, this.maxValueSize);
                 const complete: boolean = (this.position + this.maxValueSize) >= this.profileBase64.length;
 
-//                console.log(`${this.position}, ${this.maxValueSize}, ${this.profileBase64.length}, ${complete}`);
+                console.log(`${this.position}, ${this.maxValueSize}, ${this.profileBase64.length}, ${complete}, ${chunk}`);
 
+                const type: string = `0${EMConstants.EM_FROMSERVER_PROFILES.toString(16)}`.slice(-2);
                 if (this.updateValueCallback !== null) {            
+                    const s: string = JSON.stringify({
+                        type: `0x${type}`, 
+                        key: this.key,
+                        complete,
+                        chunk
+                    });
+
                     this.updateValueCallback(
-                        new Buffer(
-                            JSON.stringify({
-                                type: EMConstants.EM_FROMSERVER_PROFILES, 
-                                key: this.key,
-                                complete,
-                                chunk
-                            })
-                        )
+                        new Buffer(s)
                     );
                 }    
                 this.position += this.maxValueSize;
@@ -108,7 +109,7 @@ export class ProfilesCharacteristic extends Characteristic {
             }
 
             const action: string[] = JSON.parse(data.toString());
-            switch (parseInt(action[0], 10)) {
+            switch (parseInt(action[0], 16)) {
                 case EMConstants.EM_FROMCLIENT_GETPROFILES: {
                     this.position = 0;
                     this.key = action[1];
