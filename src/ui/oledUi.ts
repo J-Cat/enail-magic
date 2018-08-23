@@ -41,20 +41,20 @@ export class OledUi {
         this.drawIcon();
     }
 
-    flash = () => {
-        setTimeout(() => {
-            if (this.flashRate === 0) {
-                return;
-            }
+    // flash = () => {
+    //     setTimeout(() => {
+    //         if (this.flashRate === 0) {
+    //             return;
+    //         }
 
-            if (Date.now() - this.lastUpdate > this.flashRate) {
-                this.flashStatus = !this.flashStatus;
-                this.lastUpdate = Date.now();
-                this.render();
-                this.flash();
-            }
-        }, this.flashRate);
-    }
+    //         if (Date.now() - this.lastUpdate > this.flashRate) {
+    //             this.flashStatus = !this.flashStatus;
+    //             this.lastUpdate = Date.now();
+    //             this.render();
+    //             this.flash();
+    //         }
+    //     }, this.flashRate);
+    // }
 
     stop = () => {
         display.clearScreen();
@@ -65,7 +65,7 @@ export class OledUi {
 
     drawIcon = () => {
         this.drawBitmap(this._icon, 97, 40);
-        this.flash();
+        //this.flash();
     }
 
     drawBitmap = (data: Uint8Array, xPos: number, yPos: number) => {
@@ -161,32 +161,43 @@ export class OledUi {
     }
     
     displayTemperature = () => {
-        if (this.app.temperature !== 0) {
-            display.setFont(Font.UbuntuMono_16ptFontInfo);
-            display.drawString(0, 32, 
-                `${this.app.temperature}`,
-                2, Color.White, Layer.Layer0
-            );
-            display.setFont(Font.UbuntuMono_8ptFontInfo);
-        }
+        display.setFont(Font.UbuntuMono_16ptFontInfo);
+        display.drawString(0, 32, 
+            `${this.app.temperature}`,
+            2, Color.White, Layer.Layer0
+        );
+        display.setFont(Font.UbuntuMono_8ptFontInfo);
     }
 
     resetPosition() {
         this.scrollPos = 0;
     }
 
-    render() {
-        // Clear display buffer
-        display.clearScreen();
+    renderTimer = () => {
+        setTimeout(() => {
+            if (Date.now() - this.lastUpdate > 1000) {
+                this.flashStatus = !this.flashStatus;
+                this.lastUpdate = Date.now();
+                // Clear display buffer
+                display.clearScreen();
+                
+                this.displayProfile();
+                this.displayTemperature();
+
+                if (this.flashStatus || this.flashRate === 0) {
+                    this.drawIcon();
+                }
+
+                display.refresh();       
+            }
+
+            this.renderTimer();
+        }, 1000);
         
-        this.displayProfile();
-        this.displayTemperature();
+    }
 
-        if (this.flashStatus) {
-            this.drawIcon();
-        }
-
-        display.refresh();       
+    render() {
+        this.renderTimer();
     }
 }
 

@@ -166,7 +166,7 @@ export class App {
 
     render() {
         this.emService.sendData();
-        this.oledUi.render();
+        //this.oledUi.render();
         this.consoleUi.render();
     }
 
@@ -231,6 +231,7 @@ export class App {
         this.soundPlayer.play(`appear`);
 
         this.oledUi = new OledUi(0x3C, this);
+        this.oledUi.render();
 
         if (process.argv.length > 2 && process.argv[2].toLowerCase() === 'debug')
         {
