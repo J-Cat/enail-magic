@@ -58,6 +58,7 @@ export class OledUi {
 
     stop = () => {
         display.clearScreen();
+        display.refresh();
         display.turnOff();
         display.dispose();
     }
@@ -89,10 +90,7 @@ export class OledUi {
         //console.log(s);
     }
 
-    render() {
-        // Clear display buffer
-        display.clearScreen();
-        
+    displayProfile2Line = () => {
         if (!!this.app.currentProfile) {
             display.drawString(0, 0, `${this.app.currentProfile.profileIndex}`, 2, Color.White, Layer.Layer0);
 
@@ -112,17 +110,77 @@ export class OledUi {
                     s2 = `${s2.substr(0, 13)} ...`;
                 }
             }
-            display.drawString(22, 0, s1, s2.length === 0 && s1.length <= 9 ? 2 : 1, Color.White, Layer.Layer0);
+            display.drawString(20, 0, s1, s2.length === 0 && s1.length <= 9 ? 2 : 1, Color.White, Layer.Layer0);
             if (s2.length > 0) {
                 display.drawString(22, 19, s2, 1.75, Color.White, Layer.Layer0);    
             }
         }
+    }
+
+    scrollPos = 0;
+
+    displayProfileScrolling = () => {
+        if (!!this.app.currentProfile) {
+            let s: string = `#${this.app.currentProfile.profileIndex} ${this.app.currentProfile.title}`;
+            if (s.length <= 13 && this.scrollPos > 0) {
+                this.scrollPos += 1;
+                if (this.scrollPos >= 5) {
+                    let pos: number = Math.min(this.scrollPos-5, 3);
+                    if (this.scrollPos >= 50) {
+                        this.scrollPos = 0;
+                    } else if (this.scrollPos >= 50) {
+                        pos = Math.min(this.scrollPos - 49, 2);
+                    }
+                    display.drawString(0, 0, s.substr(pos), 2, Color.White, Layer.Layer0);                
+                } else {
+                    display.drawString(0, 0, s, 2, Color.White, Layer.Layer0);                
+                }
+            } else if (s.length > 10) {
+                s += " ... ";
+
+                const s1: string = s.substr(this.scrollPos, 10);
+                let s2: string = '';
+                if (s1.length < 10) { // were at the end
+                    s2 = '#' + s.substr(0, 9 - s1.length);
+                }
+
+                this.scrollPos += 1;
+                if (this.scrollPos > s.length) {
+                    this.scrollPos = 0;
+                }
+
+                display.drawString(0, 0, s1 + s2, 2, Color.White, Layer.Layer0);
+            } else {
+                display.drawString(0, 0, s, 2, Color.White, Layer.Layer0);
+            }
+        }
+    }
+
+    displayProfile = () => {
+        this.displayProfileScrolling();
+    }
+    
+    displayTemperature = () => {
         if (this.app.temperature !== 0) {
-            display.drawString(0, 48, 
+            display.setFont(Font.UbuntuMono_16ptFontInfo);
+            display.drawString(0, 32, 
                 `${this.app.temperature}`,
                 2, Color.White, Layer.Layer0
             );
+            display.setFont(Font.UbuntuMono_8ptFontInfo);
         }
+    }
+
+    resetPosition() {
+        this.scrollPos = 0;
+    }
+
+    render() {
+        // Clear display buffer
+        display.clearScreen();
+        
+        this.displayProfile();
+        this.displayTemperature();
 
         if (this.flashStatus) {
             this.drawIcon();

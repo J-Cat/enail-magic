@@ -1,4 +1,4 @@
-import { Profiles } from "../assets/profiles";
+import { Profiles } from "./profiles";
 import { Profile } from "./profile";
 import { Step, TimeStep, SwitchStep, TemperatureStep } from "./steps";
 

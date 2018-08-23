@@ -1,7 +1,7 @@
-import { Profile } from "../profiles/profile";
+import { Profile } from "./profile";
 import { App } from "../app";
 
-import { IProfile } from "../profiles/IProfile";
+import { IProfile } from "./IProfile";
 const _profiles: Array<IProfile> = require("../assets/profiles.json")
 
 let index: number = 1;

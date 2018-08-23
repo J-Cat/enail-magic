@@ -101,25 +101,29 @@ export class ProfilesCharacteristic extends Characteristic {
     }
 
     public onWriteRequest(data: Buffer, offset: number, withoutResponse: boolean, callback: (result: BlenoResult) => void) {
-        if (offset !== 0) {
-            callback(BlenoResult.RESULT_INVALID_OFFSET);
-            return;
-        }
-
-        const action: { type: string, key: string } = JSON.parse(data.toString());
-        switch (action.type) {
-            case EMConstants.EM_FROMCLIENT_GETPROFILES: {
-                this.position = 0;
-                this.key = action.key;
-                this.onNotify();
-                break;
-            }
-
-            default: {
-                callback(BlenoResult.RESULT_UNLIKELY_ERROR);
+        try {
+            if (offset !== 0) {
+                callback(BlenoResult.RESULT_INVALID_OFFSET);
                 return;
             }
+
+            const action: string[] = JSON.parse(data.toString());
+            switch (parseInt(action[0], 10)) {
+                case EMConstants.EM_FROMCLIENT_GETPROFILES: {
+                    this.position = 0;
+                    this.key = action[1];
+                    this.onNotify();
+                    break;
+                }
+
+                default: {
+                    callback(BlenoResult.RESULT_UNLIKELY_ERROR);
+                    return;
+                }
+            }
+            callback(BlenoResult.RESULT_SUCCESS);
+        } catch (e) {
+            console.log(e);
         }
-        callback(BlenoResult.RESULT_SUCCESS);
     }
 }

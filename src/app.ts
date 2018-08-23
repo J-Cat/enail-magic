@@ -5,7 +5,7 @@ import * as os from 'os';
 import Icons from './ui/icons';
 import SoundPlayer from './aplay';
 import { ConsoleUi } from './ui/consoleUi';
-import { DigitalOutput } from 'raspi-gpio';
+import { DigitalOutput, PULL_DOWN } from 'raspi-gpio';
 import { EMService } from './ble/emService';
 import { init } from 'raspi';
 import { Max6675, TemperatureSensor } from './temperature';
@@ -51,7 +51,11 @@ export class App {
                     console.log(error.message);
                 }
             });
+
+            this.oledUi.resetPosition();
+            
             //this.rgbLed.flashOn(0, 0, 25, 0.25, this.profileIndex + 1);
+
             this.render();
         }
     }
@@ -134,6 +138,7 @@ export class App {
 
     switchHeater: (onoff: number) => void = (onoff: number) => {
         if (!!this.heater) {
+//            console.log(`switch heater ${onoff}`);
             this.heater.write(isHeaterNC ? onoff === 0 ? 1 : 0: onoff);
         }
     }
@@ -196,7 +201,7 @@ export class App {
 
         this.loadConfig();
 
-        const tempSensor: TemperatureSensor = new Max6675(1, 2, 0.5);
+        const tempSensor: TemperatureSensor = new Max6675(0, 0, 0.5);
         tempSensor.onTemperatureRead.subscribe(this.onTemperatureRead);
         tempSensor.start();
 
@@ -210,7 +215,8 @@ export class App {
 
         init(() => {
             this.heater = new DigitalOutput({
-                pin: 'GPIO12'
+                pin: 'GPIO12',
+                pullResistor: PULL_DOWN
             });
             this.switchHeater(1);
         });
@@ -226,10 +232,14 @@ export class App {
 
         this.oledUi = new OledUi(0x3C, this);
 
-        this.consoleUi = new ConsoleUi(this);
-        // this.consoleUi = {
-        //     render: () => {}
-        // };
+        if (process.argv.length > 2 && process.argv[2].toLowerCase() === 'debug')
+        {
+            this.consoleUi = {
+                render: () => {}
+            };                
+        } else {
+            this.consoleUi = new ConsoleUi(this);
+        }
 
         this.render();
     }

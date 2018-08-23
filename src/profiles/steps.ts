@@ -184,5 +184,6 @@ export class SoundStep extends Step {
         } catch (e) {
             console.log(e.message);
         }
+        this._onEnd.dispatch(this);
     }
 }

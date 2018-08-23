@@ -1,6 +1,6 @@
 [
     {
-        "title": "Up-temp 75",
+        "title": "DNail 75",
         "steps": [
             {
                 "type": "icon",
@@ -155,7 +155,7 @@
         ]
     },
     {
-        "title": "Up Temp95",
+        "title": "DNail 95",
         "steps": [
             {
                 "type": "icon",
@@ -319,7 +319,7 @@
         ]
     },
     {
-        "title": "V-ROD",
+        "title": "VROD 95",
         "steps": [
             {
                 "type": "icon",
@@ -356,7 +356,7 @@
             },
             {
                 "type": "time",
-                "delay": 5
+                "delay": 4
             },
             {
                 "type": "icon",
@@ -376,7 +376,7 @@
             },
             {
                 "type": "time",
-                "delay": 10
+                "delay": 3
             },
             {
                 "type": "switch",
@@ -427,7 +427,7 @@
             },
             {
                 "type": "time",
-                "delay": 10
+                "delay": 5
             },
             {
                 "type": "sound",

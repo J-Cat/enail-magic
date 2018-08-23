@@ -26,6 +26,7 @@ export const UUID: string = "7475AB88-90C4-4A98-A95E-19D5CAB55EEB";
 export class EMCharacteristic extends Characteristic {
     private updateValueCallback: ((value: Buffer) => void) | null = null;
     private app: App;
+    private lastResult?: number[];
 
     protected _onChangeProfile: SimpleEventDispatcher<number> = new SimpleEventDispatcher<number>();
     get onChangeProfile(): ISimpleEvent<number> {
@@ -57,28 +58,53 @@ export class EMCharacteristic extends Characteristic {
         this.app = app;
     }
 
+    private isChanged = (result: number[]): boolean => {
+        let changed: boolean = false;
+        if (!this.lastResult) {
+            changed = true;
+        } else if (result.length !== this.lastResult.length) {
+            changed = true;
+        } else {
+            for (let i = 0; i < result.length; i++) {
+                if (result[i] !== this.lastResult[i]) {
+                    changed = true;
+                    break;                    
+                }
+            }
+        }
+
+        if (changed) {
+            this.lastResult = result;
+        }
+
+        return changed;
+    }
+
     public onNotify() {
         setTimeout(() => 
             {
                 if (this.updateValueCallback !== null) {            
-                    this.updateValueCallback(
-                        new Buffer(
-                            JSON.stringify({
+                    const result: number[] = [
+                        this.app.temperature, 
+                        this.app.currentProfile.running ? 1 : 0, 
+                        this.app.profileIndex, 
+                        this.app.currentProfile.currentIndex
+                    ];  
+
+                    if (this.isChanged(result)) {
+                        this.updateValueCallback(
+                            new Buffer(JSON.stringify({
                                 type: EMConstants.EM_FROMSERVER_DATA, 
-                                data: {
-                                    temperature: this.app.temperature,
-                                    status: this.app.currentProfile.running,
-                                    profileIndex: this.app.profileIndex,
-                                    stepIndex: this.app.currentProfile.running ? this.app.currentProfile.currentIndex : 0
-                                }
-                            })
-                        )
-                    );
+                                data: result
+                            }))
+                        );
+                    }
                 }
             },
             0
         );
     }
+
     public onSubscribe(maxValueSize: number, updateValueCallback: (value: Buffer) => void) {
         this.updateValueCallback = updateValueCallback;
     }
@@ -94,13 +120,18 @@ export class EMCharacteristic extends Characteristic {
             return;
         }
 
+        const result: number[] = [
+            this.app.temperature, 
+            this.app.currentProfile.running ? 1 : 0, 
+            this.app.profileIndex, 
+            this.app.currentProfile.currentIndex
+        ];  
+
         callback(BlenoResult.RESULT_SUCCESS, new Buffer(JSON.stringify({
-            temperature: this.app.temperature,
-            status: this.app.currentProfile.running,
-            profileIndex: this.app.profileIndex,
-            stepIndex: this.app.currentProfile.running ? this.app.currentProfile.currentIndex : 0
+            type: EMConstants.EM_FROMSERVER_DATA, 
+            data: result
         })));
-    }
+}
 
     public onWriteRequest(data: Buffer, offset: number, withoutResponse: boolean, callback: (result: BlenoResult) => void) {
         if (offset !== 0) {
@@ -108,15 +139,15 @@ export class EMCharacteristic extends Characteristic {
             return;
         }
 
-        const action: { type: string, value: number | boolean } = JSON.parse(data.toString());
-        switch (action.type) {
+        const action: number[] = JSON.parse(data.toString('base'));
+        switch (action[0]) {
             case EMConstants.EM_FROMCLIENT_SETPROFILE: {
-                this._onChangeProfile.dispatch(action.value as number);
+                this._onChangeProfile.dispatch(action[1] as number);
                 break;
             }
 
             case EMConstants.EM_FROMCLIENT_SETSTATUS: {
-                this._onChangeStatus.dispatch(action.value as boolean);
+                this._onChangeStatus.dispatch(action[1] === 1 ? true : false);
                 break;
             }
 
