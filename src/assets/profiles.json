@@ -15,6 +15,10 @@
                 "flashSpeed": 0
             },
             {
+                "type": "sound",
+                "sound": "powerup"
+            },
+            {
                 "type": "switch",
                 "onoff": 0
             },
@@ -35,6 +39,10 @@
                 "g": 0,
                 "b": 25,
                 "flashSpeed": 1
+            },
+            {
+                "type": "sound",
+                "sound": "bell"
             },
             {
                 "type": "switch",
@@ -78,6 +86,10 @@
                 "flashRate": 0
             },
             {
+                "type": "sound",
+                "sound": "success"
+            },
+            {
                 "type": "led",
                 "r": 25,
                 "g": 0,
@@ -111,6 +123,10 @@
                 "flashSpeed": 1
             },
             {
+                "type": "sound",
+                "sound": "bell"
+            },
+            {
                 "type": "temperature",
                 "temperature": 0,
                 "direction": 1,
@@ -131,6 +147,10 @@
             {
                 "type": "time",
                 "delay": 10
+            },
+            {
+                "type": "sound",
+                "sound": "complete"
             }
         ]
     },
@@ -148,6 +168,10 @@
                 "g": 0,
                 "b": 0,
                 "flashSpeed": 0
+            },
+            {
+                "type": "sound",
+                "sound": "powerup"
             },
             {
                 "type": "switch",
@@ -194,6 +218,10 @@
                 "flashSpeed": 0
             },
             {
+                "type": "sound",
+                "sound": "bell"
+            },
+            {
                 "type": "switch",
                 "onoff": 0
             },
@@ -212,6 +240,10 @@
                 "g": 0,
                 "b": 0,
                 "flashSpeed": 0
+            },
+            {
+                "type": "sound",
+                "sound": "success"
             },
             {
                 "type": "temperature",
@@ -246,6 +278,10 @@
                 "flashSpeed": 1
             },
             {
+                "type": "sound",
+                "sound": "bell"
+            },
+            {
                 "type": "temperature",
                 "temperature": 0,
                 "direction": 1,
@@ -275,6 +311,10 @@
             {
                 "type": "time",
                 "delay": 10
+            },
+            {
+                "type": "sound",
+                "sound": "complete"
             }
         ]
     },
@@ -294,19 +334,18 @@
                 "flashSpeed": 1
             },
             {
+                "type": "sound",
+                "sound": "bell"
+            },
+            {
                 "type": "switch",
                 "onoff": 0
             },
             {
                 "type": "temperature",
-                "temperature": -75,
+                "temperature": -65,
                 "direction": 0,
                 "timeout": 60
-            },
-            {
-                "type": "icon",
-                "icon": "drop",
-                "flashRate": 0
             },
             {
                 "type": "led",
@@ -332,8 +371,12 @@
                 "flashSpeed": 0
             },
             {
+                "type": "sound",
+                "sound": "success"
+            },
+            {
                 "type": "time",
-                "delay": 5
+                "delay": 10
             },
             {
                 "type": "switch",
@@ -350,6 +393,10 @@
                 "g": 0,
                 "b": 25,
                 "flashSpeed": 1
+            },
+            {
+                "type": "sound",
+                "sound": "beep"
             },
             {
                 "type": "temperature",
@@ -381,6 +428,10 @@
             {
                 "type": "time",
                 "delay": 10
+            },
+            {
+                "type": "sound",
+                "sound": "complete"
             }
        ]
     }

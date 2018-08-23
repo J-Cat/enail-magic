@@ -1,5 +1,5 @@
-import { Step, TemperatureStep, TimeStep, SwitchStep, LEDStep, IconStep } from "./steps";
-import { IProfile, ISwitchStep, ITimeStep, ITemperatureStep, ILEDStep, IIconStep } from "./IProfile";
+import { Step, TemperatureStep, TimeStep, SwitchStep, LEDStep, IconStep, SoundStep } from "./steps";
+import { IProfile, ISwitchStep, ITimeStep, ITemperatureStep, ILEDStep, IIconStep, ISoundStep } from "./IProfile";
 import { EventDispatcher, IEvent } from "ste-events";
 import { SimpleEventDispatcher, ISimpleEvent } from "strongly-typed-events";
 import { App } from "../app";
@@ -60,6 +60,11 @@ export class Profile {
                 case "icon": {
                     const iconStepValue: IIconStep = value as IIconStep;
                     return new IconStep(this, iconStepValue.icon, iconStepValue.flashRate);
+                }
+
+                case "sound": {
+                    const soundStepValue: ISoundStep = value as ISoundStep;
+                    return new SoundStep(this, soundStepValue.sound);
                 }
 
                 default: {

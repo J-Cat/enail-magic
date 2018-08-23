@@ -24,7 +24,7 @@ import { App } from '../app';
 import * as EMConstants from './constants';
 
 import { IProfile } from "../profiles/IProfile";
-const _profiles: Array<IProfile> = require("../profiles/profiles.json");
+const _profiles: Array<IProfile> = require("../assets/profiles.json");
 
 export const UUID: string = "10AB3AB3-0F41-408E-A99E-2B523ADEF812";
 

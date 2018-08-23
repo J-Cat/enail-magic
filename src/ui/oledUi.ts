@@ -30,6 +30,8 @@ export class OledUi {
         display.turnOn();           // Turn on display module
         display.setFont(Font.UbuntuMono_8ptFontInfo);
         this.setIcon(this._icon, 0);
+        display.clearScreen();
+        display.refresh();
     }
 
     setIcon(icon: Uint8Array, flashRate: number = 0) {

@@ -1,18 +1,22 @@
-import * as util from "util";
 import * as fs from 'fs';
 import * as path from 'path';
-import { init } from "raspi";
-import { DigitalInput, DigitalOutput, PULL_UP } from "raspi-gpio";
+import * as util from 'util';
+import * as os from 'os';
+import Icons from './ui/icons';
+import SoundPlayer from './aplay';
+import { ConsoleUi } from './ui/consoleUi';
+import { DigitalOutput } from 'raspi-gpio';
+import { EMService } from './ble/emService';
+import { init } from 'raspi';
+import { Max6675, TemperatureSensor } from './temperature';
+import { OledUi } from './ui/oledUi';
+import { Profile, Profiles } from './profiles';
+import { RgbLed } from './rgb';
+import { RotaryDial } from './ui/rotaryDial';
 
-import { TemperatureSensor, Max6675 } from "./temperature";
-import { Profile, Profiles } from "./profiles";
-import { ConsoleUi } from "./ui/consoleUi";
-import { RotaryDial } from "./ui/rotaryDial";
-import { RgbLed } from "./rgb";
+// import Sound, { ISound } from 'aplay';
 
-import { EMService } from "./ble/emService";
-import { OledUi } from "./ui/oledUi";
-import Icons from "./ui/icons";
+//const aplay: (options?: SoundOptions) => Sound = require('aplay');
 
 const isHeaterNC: boolean = true;
 
@@ -24,13 +28,14 @@ export class App {
     private profiles: Profiles = new Profiles(this);
     private rgbLed: RgbLed;
     private emService: EMService;
+    soundPlayer: SoundPlayer;
     profileIndex: number = 0;
     temperature: number = 0;
     temperatureDecimals: number = 0;
     temperatureShift: number = 0;
 
     get currentProfile(): Profile {
-        if (this.profileIndex < this.profiles.items.length) {
+        if (this.profileIndex < this.profiles.items.length && this.profileIndex >= 0) {
             return this.profiles.items[this.profileIndex];
         } else {
             throw new Error("Profile index is out of range!");
@@ -41,7 +46,11 @@ export class App {
         if (index >= 0 && index < this.profiles.items.length) {
             this.profileIndex = index;
 
-            fs.writeFile(path.resolve('~/.enailmagic'), this.profileIndex, (error) => {});
+            fs.writeFile(path.join(os.homedir(), '.enailmagic'), this.profileIndex.toString(), (error) => {
+                if (error) {
+                    console.log(error.message);
+                }
+            });
             //this.rgbLed.flashOn(0, 0, 25, 0.25, this.profileIndex + 1);
             this.render();
         }
@@ -104,6 +113,7 @@ export class App {
 
             this.render();
         } else {
+            this.soundPlayer.play('disconnected');
             this.currentProfile.abort();
 
             this.render();
@@ -138,15 +148,38 @@ export class App {
 
     // cleanup
     cleanup: () => void = () => {
-        fs.writeFile(path.resolve('~/.enailmagic'), this.profileIndex, (error) => {});
+        fs.writeFile(path.join(os.homedir(), `.enailmagic`), this.profileIndex.toString(), (error) => {
+            if (error) {
+                console.log(error.message);
+            }
+        });
         this.switchHeater(1);
-        this.oledUi.stop();
+        if (!!this.oledUi) {
+            this.oledUi.stop();
+        }
     };
 
     render() {
         this.emService.sendData();
         this.oledUi.render();
         this.consoleUi.render();
+    }
+
+    private loadConfig = () => {
+        fs.readFile(path.join(os.homedir(), `.enailmagic`), (error, data) => {
+            if (!!error) {
+                console.log(error.message);
+            } else {
+                try {
+                    this.profileIndex = parseInt(data.toString(), 10);
+                    if (isNaN(this.profileIndex) || this.profileIndex < 0 || this.profileIndex >= this.profiles.items.length) {
+                        this.profileIndex = 0;
+                    }
+                } catch (e) {
+                    this.profileIndex = 0;
+                }
+            }
+        });
     }
 
     constructor() {      
@@ -161,6 +194,8 @@ export class App {
             process.exit();
         });
 
+        this.loadConfig();
+
         const tempSensor: TemperatureSensor = new Max6675(1, 2, 0.5);
         tempSensor.onTemperatureRead.subscribe(this.onTemperatureRead);
         tempSensor.start();
@@ -173,18 +208,6 @@ export class App {
         this.rgbLed = new RgbLed('GPIO18', 'GPIO15', 'GPIO14');
         this.rgbLed.off();        
 
-        fs.readFile(path.resolve('./settings.txt'), (error, data) => {
-            if (!!error) {
-                console.log(error.message);
-            } else {
-                try {
-                    this.profileIndex = parseInt(data.toString(), 10);
-                } catch (e) {
-                    this.profileIndex = 0;
-                }
-            }
-        });
-
         init(() => {
             this.heater = new DigitalOutput({
                 pin: 'GPIO12'
@@ -196,12 +219,19 @@ export class App {
         this.emService.onChangeProfile.subscribe(this.onBleChangeProfile);
         this.emService.sendData();
 
+        this.soundPlayer = new SoundPlayer({
+            basePath: `${__dirname}/assets/sounds/`
+        });
+        this.soundPlayer.play(`appear`);
+
         this.oledUi = new OledUi(0x3C, this);
 
-//        this.consoleUi = new ConsoleUi(this);
-        this.consoleUi = {
-            render: () => {}
-        };
+        this.consoleUi = new ConsoleUi(this);
+        // this.consoleUi = {
+        //     render: () => {}
+        // };
+
+        this.render();
     }
 }
 

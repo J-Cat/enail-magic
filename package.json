@@ -4,6 +4,7 @@
   "description": "e-Nail Magic - Add Magic to your e-Nail!",
   "main": "app.js",
   "dependencies": {
+    "aplay": "^1.2.0",
     "bleno": "^0.5.0",
     "blessed": "^0.1.81",
     "lodash.throttle": "^4.1.1",

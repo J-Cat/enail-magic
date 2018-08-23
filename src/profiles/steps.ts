@@ -1,7 +1,6 @@
-import { IEvent, SimpleEventDispatcher, ISimpleEvent } from "strongly-typed-events";
-import { Profile } from "./profile";
-import { RgbLed } from "../rgb";
 import Icons from '../ui/icons';
+import { ISimpleEvent, SimpleEventDispatcher } from 'strongly-typed-events';
+import { Profile } from './profile';
 
 export abstract class Step {
     _profile: Profile;
@@ -164,5 +163,26 @@ export class IconStep extends Step {
     run = () => {
         this._profile.app.setIcon(this.icon, this.flashSpeed);
         this._onEnd.dispatch(this);
+    }
+}
+
+export class SoundStep extends Step {
+    sound: string;
+
+    constructor(profile: Profile, sound: string) {
+        super(profile);
+        this.sound = sound;
+    }
+
+    getText = (): string => {
+        return "";
+    }
+
+    run = () => {
+        try {
+            this._profile.app.soundPlayer.play(this.sound);
+        } catch (e) {
+            console.log(e.message);
+        }
     }
 }
