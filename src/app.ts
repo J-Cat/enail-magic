@@ -13,7 +13,7 @@ import { OledUi } from './ui/oledUi';
 import { Profile, Profiles } from './profiles';
 import { RgbLed } from './rgb';
 import { RotaryDial } from './ui/rotaryDial';
-
+import onExit = require('signal-exit');
 // import Sound, { ISound } from 'aplay';
 
 //const aplay: (options?: SoundOptions) => Sound = require('aplay');
@@ -22,7 +22,7 @@ const isHeaterNC: boolean = true;
 
 export class App {
     private consoleUi: { render: () => void };
-    private oledUi: OledUi;
+    public oledUi: OledUi;
     private dial: RotaryDial;
     private heater: DigitalOutput | undefined;
     private profiles: Profiles = new Profiles(this);
@@ -151,19 +151,6 @@ export class App {
         this.oledUi.setIcon(icon, flashSpeed);
     }
 
-    // cleanup
-    cleanup: () => void = () => {
-        fs.writeFile(path.join(os.homedir(), `.enailmagic`), this.profileIndex.toString(), (error) => {
-            if (error) {
-                console.log(error.message);
-            }
-        });
-        this.switchHeater(1);
-        if (!!this.oledUi) {
-            this.oledUi.stop();
-        }
-    };
-
     render() {
         this.emService.sendData();
         //this.oledUi.render();
@@ -188,17 +175,6 @@ export class App {
     }
 
     constructor() {      
-        // capture process termination to ensure cleanup
-        process.on("exit", code => {
-            this.cleanup();
-        });
-
-        process.on("uncaughtException", err => {
-            this.cleanup();
-            console.log(err);
-            process.exit();
-        });
-
         this.loadConfig();
 
         const tempSensor: TemperatureSensor = new Max6675(0, 0, 0.5);
@@ -247,3 +223,23 @@ export class App {
 }
 
 const app: App = new App();
+
+onExit((exitCode, signal) => { 
+    console.log('Closing eNail Magic ...');
+    console.log('  Saving configuration ...');
+    fs.writeFile(path.join(os.homedir(), `.enailmagic`), app.profileIndex.toString(), (error) => {
+        if (error) {
+            console.log(`  Error saving configuration: ${error.message}`);
+        } else {
+            console.log('  Configuration saved.');
+        }
+    });
+    console.log('  Turning off heater ...');
+    app.switchHeater(1);
+    console.log('  Clearing display ...');
+    if (!!app.oledUi) {
+        app.oledUi.stop();
+        console.log('  Display cleared.');
+    }
+    console.log('Done.');
+});

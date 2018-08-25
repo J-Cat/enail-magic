@@ -12,6 +12,7 @@
     "raspi": "^5.0.2",
     "raspi-gpio": "^6.0.0",
     "raspi-soft-pwm": "^5.0.0",
+    "signal-exit": "^3.0.2",
     "spi-device": "^2.0.3",
     "ssd1306-i2c-js": "^1.0.2",
     "strongly-typed-events": "^1.4.6",
