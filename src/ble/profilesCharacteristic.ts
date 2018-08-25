@@ -108,11 +108,11 @@ export class ProfilesCharacteristic extends Characteristic {
                 return;
             }
 
-            const action: string[] = JSON.parse(data.toString());
-            switch (parseInt(action[0], 16)) {
+            const action: (number|string)[] = JSON.parse(data.toString());
+            switch (action[0]) {
                 case EMConstants.EM_FROMCLIENT_GETPROFILES: {
                     this.position = 0;
-                    this.key = action[1];
+                    this.key = action[1] as string;
                     this.onNotify();
                     break;
                 }

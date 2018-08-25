@@ -33,9 +33,9 @@ export class EMCharacteristic extends Characteristic {
         return this._onChangeProfile.asEvent();
     }
 
-    protected _onChangeStatus: SimpleEventDispatcher<boolean> = new SimpleEventDispatcher<boolean>();
-    get onChangeStatus(): ISimpleEvent<boolean> {
-        return this._onChangeStatus.asEvent();
+    protected _onRunProfile: SimpleEventDispatcher<number> = new SimpleEventDispatcher<number>();
+    get onRunProfile(): ISimpleEvent<number> {
+        return this._onRunProfile.asEvent();
     }
 
     constructor(app: App) {
@@ -137,20 +137,22 @@ export class EMCharacteristic extends Characteristic {
 }
 
     public onWriteRequest(data: Buffer, offset: number, withoutResponse: boolean, callback: (result: BlenoResult) => void) {
+        console.log('write request');
         if (offset !== 0) {
             callback(BlenoResult.RESULT_INVALID_OFFSET);
+            console.log("offset?");
             return;
         }
 
         const action: number[] = JSON.parse(data.toString());
         switch (action[0]) {
             case EMConstants.EM_FROMCLIENT_SETPROFILE: {
-                this._onChangeProfile.dispatch(action[1] as number);
+                this._onChangeProfile.dispatch(action[1]);
                 break;
             }
 
-            case EMConstants.EM_FROMCLIENT_SETSTATUS: {
-                this._onChangeStatus.dispatch(action[1] === 1 ? true : false);
+            case EMConstants.EM_FROMCLIENT_RUNPROFILE: {
+                this._onRunProfile.dispatch(action[1]);
                 break;
             }
 

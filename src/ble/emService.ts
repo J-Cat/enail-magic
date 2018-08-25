@@ -34,6 +34,11 @@ export class EMService {
         return this._onChangeProfile.asEvent();
     }
 
+    protected _onRunProfile: SimpleEventDispatcher<number> = new SimpleEventDispatcher<number>();
+    get onRunProfile(): ISimpleEvent<number> {
+        return this._onRunProfile.asEvent();
+    }
+
     constructor(app: App) {
         this.app = app;
         Bleno.on("stateChange", (state: string) => {
@@ -57,6 +62,9 @@ export class EMService {
         this.emCh = new EMCharacteristic(this.app);
         this.emCh.onChangeProfile.subscribe((value: number) => {
             this._onChangeProfile.dispatch(value);
+        });
+        this.emCh.onRunProfile.subscribe((value: number) => {
+            this._onRunProfile.dispatch(value);
         });
 
         this.profilesCh = new ProfilesCharacteristic();

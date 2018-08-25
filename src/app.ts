@@ -18,7 +18,7 @@ import onExit = require('signal-exit');
 
 //const aplay: (options?: SoundOptions) => Sound = require('aplay');
 
-const isHeaterNC: boolean = true;
+const isHeaterNC: boolean = false;
 
 export class App {
     private consoleUi: { render: () => void };
@@ -103,25 +103,7 @@ export class App {
     }
 
     onButton: (source: RotaryDial) => void = (source: RotaryDial) => {
-        if (!this.currentProfile.running) {
-            this.currentProfile.onEnd.one((profile: Profile) => {
-                this.currentProfile.onNextStep.unsubscribe(this.onNextStep);
-                this.oledUi.setIcon(Icons.home, 0);
-                this.rgbLed.off();
-                this.switchHeater(1);
-            });
-
-            this.currentProfile.onNextStep.subscribe(this.onNextStep);
-
-            this.currentProfile.run();
-
-            this.render();
-        } else {
-            this.soundPlayer.play('disconnected');
-            this.currentProfile.abort();
-
-            this.render();
-        }
+        this.runProfile(this.currentProfile.profileIndex);
     }
 
     onNextStep: (profile: Profile) => void = (profile: Profile) => {
@@ -136,9 +118,38 @@ export class App {
         this.setProfile(index);
     }
 
+    onBleRunProfile: (index: number) => void = (index: number) => {
+        this.runProfile(index);
+    }
+
+    private runProfile = (index: number) => {
+        if (!this.currentProfile.running) {
+            this.currentProfile.onEnd.one((profile: Profile) => {
+                this.currentProfile.onNextStep.unsubscribe(this.onNextStep);
+                this.oledUi.setIcon(Icons.home, 0);
+                this.rgbLed.off();
+                this.switchHeater(1);
+            });
+
+            this.setProfile(index);
+
+            this.currentProfile.onNextStep.subscribe(this.onNextStep);
+
+            this.currentProfile.run();
+
+            this.render();
+        } else {
+            this.soundPlayer.play('disconnected');
+            this.currentProfile.abort();
+
+            this.setProfile(index);
+
+            this.render();
+        }
+    }
+
     switchHeater: (onoff: number) => void = (onoff: number) => {
         if (!!this.heater) {
-//            console.log(`switch heater ${onoff}`);
             this.heater.write(isHeaterNC ? onoff === 0 ? 1 : 0: onoff);
         }
     }
@@ -199,6 +210,7 @@ export class App {
 
         this.emService = new EMService(this);
         this.emService.onChangeProfile.subscribe(this.onBleChangeProfile);
+        this.emService.onRunProfile.subscribe(this.onBleRunProfile);
         this.emService.sendData();
 
         this.soundPlayer = new SoundPlayer({
