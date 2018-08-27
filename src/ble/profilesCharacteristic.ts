@@ -23,7 +23,7 @@ import { App } from '../app';
 
 import * as EMConstants from './constants';
 
-import { IProfile } from "../profiles/IProfile";
+import { IProfile } from "../models";
 const _profiles: Array<IProfile> = require("../assets/profiles.json");
 
 export const UUID: string = "10AB3AB3-0F41-408E-A99E-2B523ADEF812";
@@ -66,7 +66,7 @@ export class ProfilesCharacteristic extends Characteristic {
                 const chunk: string = this.profileBase64.substr(this.position, this.maxValueSize);
                 const complete: boolean = (this.position + this.maxValueSize) >= this.profileBase64.length;
 
-                console.log(`${this.position}, ${this.maxValueSize}, ${this.profileBase64.length}, ${complete}, ${chunk}`);
+//                console.log(`${this.position}, ${this.maxValueSize}, ${this.profileBase64.length}, ${complete}, ${chunk}`);
 
                 const type: string = `0${EMConstants.EM_FROMSERVER_PROFILES.toString(16)}`.slice(-2);
                 if (this.updateValueCallback !== null) {            

@@ -18,7 +18,7 @@ import onExit = require('signal-exit');
 
 //const aplay: (options?: SoundOptions) => Sound = require('aplay');
 
-const isHeaterNC: boolean = false;
+const isHeaterNC: boolean = true;
 
 export class App {
     private consoleUi: { render: () => void };
@@ -128,6 +128,7 @@ export class App {
                 this.currentProfile.onNextStep.unsubscribe(this.onNextStep);
                 this.oledUi.setIcon(Icons.home, 0);
                 this.rgbLed.off();
+                console.log('finished!');
                 this.switchHeater(1);
             });
 
@@ -135,6 +136,7 @@ export class App {
 
             this.currentProfile.onNextStep.subscribe(this.onNextStep);
 
+            console.log('running');
             this.currentProfile.run();
 
             this.render();

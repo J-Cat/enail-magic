@@ -1,7 +1,7 @@
 import * as  Blessed from "blessed";
 import { Profile } from "../profiles/profile";
 import { App } from "../app";
-import { TemperatureStep } from "../profiles";
+
 export class ConsoleUi {
     private screen: Blessed.Widgets.Screen;
     private box: Blessed.Widgets.BoxElement;

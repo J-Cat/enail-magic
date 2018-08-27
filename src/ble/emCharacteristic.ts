@@ -19,7 +19,11 @@ import { SimpleEventDispatcher, ISimpleEvent } from 'ste-simple-events';
 import { BlenoResult } from './BlenoResult';
 import { App } from '../app';
 
+import statistics from '../statistics/statistics';
+import { IProfileStatistic, IStatisticData } from "../statistics/IStatistics";
+
 import * as EMConstants from './constants';
+import { Step } from '../profiles';
 
 export const UUID: string = "7475AB88-90C4-4A98-A95E-19D5CAB55EEB";
 
@@ -84,6 +88,18 @@ export class EMCharacteristic extends Characteristic {
         setTimeout(() => 
             {
                 if (this.updateValueCallback !== null) {            
+                    let profileEstimate: number = 0;
+                    let stepEstimate: number = 0;
+                    if (this.app.currentProfile.running) {
+                        profileEstimate = statistics.getEstimate(this.app.currentProfile.key);
+                        const profilePercent: number = (Date.now() - this.app.currentProfile.startTime) / profileEstimate;
+                        profileEstimate = Math.round(profilePercent * 100) / 100;
+
+                        const step: Step = this.app.currentProfile.steps[this.app.currentProfile.currentIndex];
+                        stepEstimate = statistics.getStepEstimate(this.app.currentProfile.key, step.key);
+                        const stepPercent: number = (Date.now() - step.startTime) / stepEstimate;
+                        stepEstimate = Math.round(stepPercent * 100) / 100;
+                    }
                     const type: string = `0${EMConstants.EM_FROMSERVER_DATA.toString(16)}`.slice(-2);
                     const result: { type: string, data: number[] } = {
                         type: `0x${type}`,
@@ -91,12 +107,14 @@ export class EMCharacteristic extends Characteristic {
                             this.app.temperature, 
                             this.app.currentProfile.running ? 1 : 0, 
                             this.app.profileIndex, 
-                            this.app.currentProfile.currentIndex
+                            this.app.currentProfile.currentIndex,
+                            profileEstimate,
+                            stepEstimate                                
                         ]
                     };  
 
                     if (this.isChanged(result.data)) {
-                        console.log(JSON.stringify(result));
+//                        console.log(JSON.stringify(result));
                         this.updateValueCallback(
                             new Buffer(JSON.stringify(result))
                         );
@@ -126,7 +144,9 @@ export class EMCharacteristic extends Characteristic {
             this.app.temperature, 
             this.app.currentProfile.running ? 1 : 0, 
             this.app.profileIndex, 
-            this.app.currentProfile.currentIndex
+            this.app.currentProfile.currentIndex,
+            statistics.getEstimate(this.app.currentProfile.key),
+            statistics.getStepEstimate(this.app.currentProfile.key, this.app.currentProfile.steps[this.app.currentProfile.currentIndex].key)
         ];  
 
         const type: string = `0${EMConstants.EM_FROMSERVER_DATA.toString(16)}`.slice(-2);
@@ -137,10 +157,10 @@ export class EMCharacteristic extends Characteristic {
 }
 
     public onWriteRequest(data: Buffer, offset: number, withoutResponse: boolean, callback: (result: BlenoResult) => void) {
-        console.log('write request');
+//        console.log('write request');
         if (offset !== 0) {
             callback(BlenoResult.RESULT_INVALID_OFFSET);
-            console.log("offset?");
+//            console.log("offset?");
             return;
         }
 

@@ -141,7 +141,7 @@ export class OledUi {
                 const s1: string = s.substr(this.scrollPos, 10);
                 let s2: string = '';
                 if (s1.length < 10) { // were at the end
-                    s2 = '#' + s.substr(0, 9 - s1.length);
+                    s2 = s.substr(0, 9 - s1.length);
                 }
 
                 this.scrollPos += 1;

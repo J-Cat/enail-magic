@@ -1,450 +1,88 @@
 [
     {
-        "title": "DNail 75",
+        "title": "D-Nail Down-Temp 95",
         "steps": [
             {
-                "type": "switch",
-                "onoff": 0
+                "type": "action", "onoff": false
             },
             {
-                "type": "icon",
-                "icon": "thermometerDown",
-                "flashRate": 0
+                "type": "feedback",
+                "led": { "r": 25, "g": 0, "b": 0, "flash": 1 },
+                "icon": { "icon": "thermometerDown", "flash": 1 },
+                "sounds": { "start": "bell", "end": "complete" }
             },
             {
-                "type": "led",
-                "r": 25,
-                "g": 0,
-                "b": 0,
-                "flashSpeed": 1
+                "type": "conditional",
+                "temperature": -95, "direction": "DOWN",
+                "delays": {
+                    "start": 0, "timeout": 60, "end": 3
+                },
+                "message": "Dropping ... wait ...",
+                "sounds": { "end": "bell" }
             },
             {
-                "type": "sound",
-                "sound": "bell"
+                "type": "action", "onoff": true
             },
             {
-                "type": "temperature",
-                "temperature": -75,
-                "direction": 0,
-                "timeout": 60
+                "type": "feedback",
+                "led": { "r": 0, "g": 0, "b": 25, "flash": 1 },
+                "icon": { "icon": "drop", "flash": 1 }
             },
             {
-                "type": "switch",
-                "onoff": 1
+                "type": "conditional",
+                "temperature": -70, "direction": "UP",
+                "delays": { "start": 0, "timeout": 60, "end": 0 },
+                "message": "Start inhaling!"
             },
             {
-                "type": "icon",
-                "icon": "drop",
-                "flashRate": 1000
+                "type": "action", "onoff": false
             },
             {
-                "type": "led",
-                "r": 0,
-                "g": 0,
-                "b": 25,
-                "flashSpeed": 1
+                "type": "feedback",
+                "led": { "r": 0, "g": 0, "b": 25, "flash": 0 },
+                "icon": { "icon": "drop", "flash": 0 },
+                "delays": { "end": 15 }
             },
             {
-                "type": "sound",
-                "sound": "bell"
+                "type": "feedback",
+                "led": { "r": 25, "g": 0, "b": 0, "flash": 0 },
+                "icon": { "icon": "cloud", "flash": 0 },
+                "sounds": { "end": "complete" }
             },
             {
-                "type": "temperature",
-                "temperature": -60,
-                "direction": 1,
-                "timeout": 60
+                "type": "conditional",
+                "temperature": -45, "direction": "DOWN",
+                "delays": { "start": 5, "timeout": 60, "end": 3 },
+                "message": "(Exhale ...)",
+                "sounds": { "end": "bell" }
             },
             {
-                "type": "switch",
-                "onoff": 0
+                "type": "action", "onoff": true,
+                "message": "Time to go again!"
             },
             {
-                "type": "icon",
-                "icon": "drop",
-                "flashRate": 0
+                "type": "feedback",
+                "led": { "r": 0, "g": 0, "b": 25, "flash": 1 },
+                "icon": { "icon": "drop", "flash": 1 }
             },
             {
-                "type": "led",
-                "r": 0,
-                "g": 0,
-                "b": 25,
-                "flashSpeed": 0
+                "type": "conditional",
+                "temperature": 0, "direction": "UP",
+                "delays": { "start": 0, "timeout": 60, "end": 5 },
+                "message": "(Exhale ...)",
+                "sounds": { "end": "bell" }
             },
             {
-                "type": "time",
-                "delay": 10
+                "type": "feedback",
+                "icon": { "icon": "cloud", "flash": 1 },
+                "delays": { "end": 10 }
             },
             {
-                "type": "temperature",
-                "temperature": -35,
-                "direction": 0,
-                "timeout": 60
-            },
-            {
-                "type": "icon",
-                "icon": "cloud",
-                "flashRate": 0
-            },
-            {
-                "type": "sound",
-                "sound": "complete"
-            },
-            {
-                "type": "led",
-                "r": 25,
-                "g": 0,
-                "b": 0,
-                "flashSpeed": 1
-            },
-            {
-                "type": "time",
-                "delay": 5
-            },
-            {
-                "type": "temperature",
-                "temperature": -35,
-                "direction": 0,
-                "timeout": 60
-            },
-            {
-                "type": "switch",
-                "onoff": 1
-            },
-            {
-                "type": "icon",
-                "icon": "drop",
-                "flashRate": 1000
-            },
-            {
-                "type": "led",
-                "r": 0,
-                "g": 0,
-                "b": 25,
-                "flashSpeed": 1
-            },
-            {
-                "type": "sound",
-                "sound": "bell"
-            },
-            {
-                "type": "temperature",
-                "temperature": 0,
-                "direction": 1,
-                "timeout": 60
-            },
-            {
-                "type": "icon",
-                "icon": "cloud",
-                "flashRate": 0
-            },
-            {
-                "type": "led",
-                "r": 0,
-                "g": 25,
-                "b": 0,
-                "flashSpeed": 0
-            },
-            {
-                "type": "time",
-                "delay": 10
-            },
-            {
-                "type": "sound",
-                "sound": "complete"
+                "type": "feedback",
+                "led": { "r": 0, "g": 25, "b": 0, "flash": 0 },
+                "icon": { "icon": "cloud", "flash": 0 },
+                "sounds": { "end": "complete" }
             }
         ]
-    },
-    {
-        "title": "DNail 95",
-        "steps": [
-            {
-                "type": "switch",
-                "onoff": 0
-            },
-            {
-                "type": "icon",
-                "icon": "thermometerDown",
-                "flashRate": 0
-            },
-            {
-                "type": "led",
-                "r": 25,
-                "g": 0,
-                "b": 0,
-                "flashSpeed": 1
-            },
-            {
-                "type": "sound",
-                "sound": "bell"
-            },
-            {
-                "type": "temperature",
-                "temperature": -95,
-                "direction": 0,
-                "timeout": 60
-            },
-            {
-                "type": "sound",
-                "sound": "bell"
-            },
-            {
-                "type": "time",
-                "delay": 3
-            },
-            {
-                "type": "switch",
-                "onoff": 1
-            },
-            {
-                "type": "icon",
-                "icon": "drop",
-                "flashRate": 1000
-            },
-            {
-                "type": "led",
-                "r": 0,
-                "g": 0,
-                "b": 25,
-                "flashSpeed": 1
-            },
-            {
-                "type": "temperature",
-                "temperature": -70,
-                "direction": 1,
-                "timeout": 60
-            },
-            {
-                "type": "switch",
-                "onoff": 0
-            },
-            {
-                "type": "icon",
-                "icon": "drop",
-                "flashRate": 0
-            },
-            {
-                "type": "led",
-                "r": 0,
-                "g": 0,
-                "b": 25,
-                "flashSpeed": 0
-            },
-            {
-                "type": "time",
-                "delay": 15
-            },
-            {
-                "type": "icon",
-                "icon": "cloud",
-                "flashRate": 0
-            },
-            {
-                "type": "led",
-                "r": 25,
-                "g": 0,
-                "b": 0,
-                "flashSpeed": 0
-            },
-            {
-                "type": "sound",
-                "sound": "complete"
-            },
-            {
-                "type": "temperature",
-                "temperature": -45,
-                "direction": 0,
-                "timeout": 60
-            },
-            {
-                "type": "time",
-                "delay": 5
-            },
-            {
-                "type": "temperature",
-                "temperature": -45,
-                "direction": 0,
-                "timeout": 60
-            },
-            {
-                "type": "sound",
-                "sound": "bell"
-            },
-            {
-                "type": "time",
-                "delay": 3
-            },
-            {
-                "type": "switch",
-                "onoff": 1
-            },
-            {
-                "type": "icon",
-                "icon": "drop",
-                "flashRate": 1000
-            },
-            {
-                "type": "led",
-                "r": 0,
-                "g": 0,
-                "b": 25,
-                "flashSpeed": 1
-            },
-            {
-                "type": "temperature",
-                "temperature": 0,
-                "direction": 1,
-                "timeout": 60
-            },
-            {
-                "type": "time",
-                "delay": 5
-            },
-            {
-                "type": "icon",
-                "icon": "cloud",
-                "flashRate": 1000
-            },
-            {
-                "type": "time",
-                "delay": 5
-            },
-            {
-                "type": "icon",
-                "icon": "cloud",
-                "flashSpeed": 0
-            },
-            {
-                "type": "led",
-                "r": 0,
-                "g": 25,
-                "b": 0,
-                "flashSpeed": 0
-            },
-            {
-                "type": "time",
-                "delay": 5
-            },
-            {
-                "type": "sound",
-                "sound": "complete"
-            }
-        ]
-    },
-    {
-        "title": "VROD 95",
-        "steps": [
-            {
-                "type": "icon",
-                "icon": "drop",
-                "flashRate": 1000
-            },
-            {
-                "type": "led",
-                "r": 0,
-                "g": 0,
-                "b": 25,
-                "flashSpeed": 1
-            },
-            {
-                "type": "sound",
-                "sound": "bell"
-            },
-            {
-                "type": "switch",
-                "onoff": 0
-            },
-            {
-                "type": "temperature",
-                "temperature": -65,
-                "direction": 0,
-                "timeout": 60
-            },
-            {
-                "type": "led",
-                "r": 0,
-                "g": 0,
-                "b": 25,
-                "flashSpeed": 0
-            },
-            {
-                "type": "time",
-                "delay": 4
-            },
-            {
-                "type": "icon",
-                "icon": "cloud",
-                "flashRate": 0
-            },
-            {
-                "type": "led",
-                "r": 25,
-                "g": 0,
-                "b": 0,
-                "flashSpeed": 0
-            },
-            {
-                "type": "sound",
-                "sound": "complete"
-            },
-            {
-                "type": "time",
-                "delay": 3
-            },
-            {
-                "type": "switch",
-                "onoff": 1
-            },
-            {
-                "type": "icon",
-                "icon": "drop",
-                "flashRate": 1000
-            },
-            {
-                "type": "led",
-                "r": 0,
-                "g": 0,
-                "b": 25,
-                "flashSpeed": 1
-            },
-            {
-                "type": "sound",
-                "sound": "bell"
-            },
-            {
-                "type": "temperature",
-                "temperature": 0,
-                "direction": 1,
-                "timeout": 60
-            },
-            {
-                "type": "icon",
-                "icon": "cloud",
-                "flashRate": 1000
-            },
-            {
-                "type": "time",
-                "delay": 5
-            },
-            {
-                "type": "icon",
-                "icon": "cloud",
-                "flashSpeed": 0
-            },
-            {
-                "type": "led",
-                "r": 0,
-                "g": 25,
-                "b": 0,
-                "flashSpeed": 0
-            },
-            {
-                "type": "time",
-                "delay": 5
-            },
-            {
-                "type": "sound",
-                "sound": "complete"
-            }
-       ]
     }
 ]
