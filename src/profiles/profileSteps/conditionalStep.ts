@@ -23,8 +23,8 @@ import { IStatisticData } from '../../statistics/IStatistics';
 export class ConditionalStep extends Step {    
     resolveFunc?: () => void;
 
-    protected _onTempReached: SimpleEventDispatcher<Step> = new SimpleEventDispatcher<Step>();
-    get onTempReached(): ISimpleEvent<Step> {
+    protected _onTempReached: SimpleEventDispatcher<boolean> = new SimpleEventDispatcher<boolean>();
+    get onTempReached(): ISimpleEvent<boolean> {
         return this._onTempReached.asEvent()
     }
 
@@ -32,30 +32,38 @@ export class ConditionalStep extends Step {
         super(step, profile, index);
     }
 
-    public run = (afterFunc: () => void) => {
-        this.profile.onTemperatureChange.subscribe(this.onTemperatureChange);
-        this.onTempReached.subscribe(() => {
-            this.profile.onTemperatureChange.unsubscribe(this.onTemperatureChange);
-            afterFunc();
+    public run = (step: Step): Promise<Step> => {
+        return new Promise((resolve, reject) => {
+            this.profile.onTemperatureChange.subscribe(this.onTemperatureChange);
+            this.onTimeout.one(() => {
+                this.profile.onTemperatureChange.unsubscribe(this.onTemperatureChange);
+                resolve(this);
+            });
+            this.onTempReached.one((success) => {
+                this.profile.onTemperatureChange.unsubscribe(this.onTemperatureChange);
+                resolve(this);
+            });
         });
     }
 
     public onTemperatureChange = (profile: Profile, value: number) => {
-        if (!this.running) { return; }
+        if (!this.profile.running) {
+            this._onTempReached.dispatch(false);
+        }
 
         const conditionalStep: IConditionalStep = this.step as IConditionalStep;
         const checkTemp: number = profile.startTemp + conditionalStep.temperature;
         switch (conditionalStep.direction) {
             case Direction.DOWN: {
                 if (value <= checkTemp) {
-                    this._onTempReached.dispatch(this);
+                    this._onTempReached.dispatch(true);
                 }
                 break;
             }
 
             case Direction.UP: {
                 if (value >= checkTemp) {
-                    this._onTempReached.dispatch(this);
+                    this._onTempReached.dispatch(true);
                 }    
                 break;
             }

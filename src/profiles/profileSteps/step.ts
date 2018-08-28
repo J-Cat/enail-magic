@@ -28,10 +28,11 @@ export abstract class Step {
     step: IStep | IActionStep | IConditionalStep | IFeedbackStep;
     running: boolean = false;
     timeout: boolean = false;
+    timeoutTimer?: NodeJS.Timer;
 
-    protected _onEnd: SimpleEventDispatcher<Step> = new SimpleEventDispatcher<Step>();
-    get onEnd(): ISimpleEvent<Step> {
-        return this._onEnd.asEvent();
+    protected _onTimeout: SimpleEventDispatcher<Step> = new SimpleEventDispatcher<Step>();
+    get onTimeout(): ISimpleEvent<Step> {
+        return this._onTimeout.asEvent();
     }
 
     constructor(step: IStep, profile: Profile, index: number) {
@@ -44,86 +45,92 @@ export abstract class Step {
         return this.profile.title;
     }
 
-    abstract run: (afterFunc: () => void) => void;
+    abstract run: (step: Step) => Promise<Step>;
 
-    public beforeRun = (runFunc: (afterFunc: () => void) => void) => {
-        this.startTime = Date.now();
-        this.running = true;
-        this.state = 0;
-
-        if (!!this.step.sounds && !!this.step.sounds.start) {
-            this.profile.app.soundPlayer.play(this.step.sounds.start);
-        }
-
+    public start = (): Promise<Step> => {
         // if timeout timer set that one up to
         // check timer
         if (!!this.step.delays && !!this.step.delays.timeout) {
             if (this.step.delays.timeout > 0) {
-                this.timeout = true;
-                new Promise((resolve, reject) => {
-                    setTimeout(resolve.bind(null), this.step.delays!.timeout! * 1000);
-                }).then(() => {
-                    if (this.state < 1 && this.running) {
-                        this.state = 1;
-                        console.log("TIMED OUT!!!!!!!!!!!!!!!!!!!!");
-                        this.afterRun();;
+                setTimeout((step) => {
+                    if (step.state < 1 && step.running) {
+                        step.timeout = true;
+                        step.state = 1;
+                        // this needs to be intercepted in each individual run method
+                        // of the steps to cancel out
+                        step._onTimeout.dispatch(step);
                     }
-                });
+                }, this.step.delays!.timeout! * 1000, this);
             }
         }
 
-        // check start timer
-        if (!!this.step.delays && !!this.step.delays.start) {
-            if (this.step.delays.start > 0) {
-//                console.log(`START TIMER - ${this.step.delays.start}`);
-                new Promise((resolve, reject) => {
-                    setTimeout(resolve.bind(null), this.step.delays!.start! * 1000);
-                }).then(() => {
-//                    console.log(`START TIMER DONE!`);
-                    this.run(this.afterRun);
-                });
-                return;
-            } 
-        } 
+        return new Promise((resolve, reject) => {
+            this.startTime = Date.now();
+            this.running = true;
+            this.state = 0;
 
-        this.run(this.afterRun);
+            if (!!this.step.sounds && !!this.step.sounds.start) {
+                this.profile.app.soundPlayer.play(this.step.sounds.start);
+            }
+
+            // check start timer
+            if (!!this.step.delays && !!this.step.delays.start) {
+                if (this.step.delays.start > 0) {
+                    setTimeout((step) => {
+                        resolve(step);
+                    }, this.step.delays!.start! * 1000, this);
+                } else {
+                    resolve(this);    
+                }
+            } else {
+                resolve(this);    
+            }
+        });
     }
 
-    public afterRun = () => {
-        this.state = 2;
-        
-        if (!!this.step.sounds && !!this.step.sounds.end) {
-            this.profile.app.soundPlayer.play(this.step.sounds.end);
+    public afterRun = (step: Step): Promise<Step> => {
+        // got here so no more timeout which is only for main loop
+        // cancel timeout
+        if (!!this.timeoutTimer) {
+            clearTimeout(this.timeoutTimer);
+            delete(this.timeoutTimer);
         }
-
-        // check end timer
-        if (!!this.step.delays && !!this.step.delays.end) {
-            if (this.step.delays.end > 0) {
-//                console.log(`END TIMER - ${this.step.delays.end}`);
-                new Promise((resolve, reject) => {
-                    setTimeout(resolve.bind(null), this.step.delays!.end! * 1000);
-                }).then(() => {
-//                    console.log('END TIMER! (MAYBE?)');
-                    if (this.state < 3) {
-                        this.state = 3;
-                        this.complete();
-                    }
-                })
-                return;
+        return new Promise((resolve, reject) => {
+            this.state = 2;
+            
+            // check end timer
+            if (!!this.step.delays && !!this.step.delays.end) {
+                if (this.step.delays.end > 0) {
+                    setTimeout((step) => {
+                        if (step.state < 3) {
+                            step.state = 3;
+                            resolve(step)
+                        }
+                    }, this.step.delays!.end! * 1000, this);
+                    return;
+                } 
             } 
-        } 
-    
-        this.complete();
+        
+            resolve(this);
+        });
     }
 
-    public complete = () => {
-        this.state = 3;
-        this.running = false;
-        this.timeout = false;
-        this.endTime = Date.now();
+    public complete = (step: Step): Promise<Step> => {
+        return new Promise((resolve, reject) => {
+            if (!!this.step.sounds && !!this.step.sounds.end && this.running) {
+                this.profile.app.soundPlayer.play(this.step.sounds.end);
+            }
 
-//        console.log('complete!');
-        this._onEnd.dispatch(this);
+            if (!!this.timeoutTimer) {
+                this.timeoutTimer.unref();
+            }
+            this.state = 3;
+            this.running = false;
+            this.timeout = false;
+            this.endTime = Date.now();
+
+            resolve(this);
+        });
     }
 
     // by default just return 100% complete for immediate steps, they are done when they start!

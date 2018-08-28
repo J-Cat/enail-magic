@@ -14,18 +14,16 @@ export class FeedbackStep extends Step {
         }
     }
 
-    public get Step(): IFeedbackStep {
-        return this.step as IFeedbackStep
-    }
-
-    public run = (afterFunc: () => void) => {
-        if (!!this.Step.led) {
-            this.profile.app.emitColor(this.Step.led.r, this.Step.led.g, this.Step.led.b, this.Step.led.flash);
-        }
-        if (!!this.icon) {
-            this.profile.app.setIcon(this.icon, this.Step.icon!.flash);
-        }  
-
-        afterFunc();
+    public run = (step: Step): Promise<Step> => {
+        return new Promise((resolve, reject) => {
+            const feedbackStep: IFeedbackStep = step.step;
+            if (!!feedbackStep.led) {
+                this.profile.app.emitColor(feedbackStep.led.r, feedbackStep.led.g, feedbackStep.led.b, feedbackStep.led.flash);
+            }
+            if (!!this.icon && !!feedbackStep.icon) {
+                this.profile.app.setIcon(this.icon, feedbackStep.icon!.flash);
+            } 
+            resolve(this);
+        });
     }
 }

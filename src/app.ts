@@ -43,6 +43,10 @@ export class App {
     }
 
     setProfile(index: number) {
+        if (this.currentProfile.running) {
+            return;
+        }
+
         if (index >= 0 && index < this.profiles.items.length) {
             this.profileIndex = index;
 
@@ -103,7 +107,7 @@ export class App {
     }
 
     onButton: (source: RotaryDial) => void = (source: RotaryDial) => {
-        this.runProfile(this.currentProfile.profileIndex);
+        this.runProfile(this.profileIndex);
     }
 
     onNextStep: (profile: Profile) => void = (profile: Profile) => {
@@ -128,7 +132,7 @@ export class App {
                 this.currentProfile.onNextStep.unsubscribe(this.onNextStep);
                 this.oledUi.setIcon(Icons.home, 0);
                 this.rgbLed.off();
-                console.log('finished!');
+                this.soundPlayer.play('complete');
                 this.switchHeater(1);
             });
 
@@ -136,7 +140,6 @@ export class App {
 
             this.currentProfile.onNextStep.subscribe(this.onNextStep);
 
-            console.log('running');
             this.currentProfile.run();
 
             this.render();

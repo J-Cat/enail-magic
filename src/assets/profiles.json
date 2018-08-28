@@ -1,6 +1,6 @@
 [
     {
-        "title": "D-Nail Down-Temp 95",
+        "title": "D-Nail 95",
         "steps": [
             {
                 "type": "action", "onoff": false
@@ -9,7 +9,7 @@
                 "type": "feedback",
                 "led": { "r": 25, "g": 0, "b": 0, "flash": 1 },
                 "icon": { "icon": "thermometerDown", "flash": 1 },
-                "sounds": { "start": "bell", "end": "complete" }
+                "sounds": { "start": "bell" }
             },
             {
                 "type": "conditional",
@@ -51,7 +51,7 @@
             },
             {
                 "type": "conditional",
-                "temperature": -45, "direction": "DOWN",
+                "temperature": -70, "direction": "DOWN",
                 "delays": { "start": 5, "timeout": 60, "end": 3 },
                 "message": "(Exhale ...)",
                 "sounds": { "end": "bell" }
@@ -82,6 +82,154 @@
                 "led": { "r": 0, "g": 25, "b": 0, "flash": 0 },
                 "icon": { "icon": "cloud", "flash": 0 },
                 "sounds": { "end": "complete" }
+            }
+        ]
+    },
+    {
+        "title": "D-Nail 75",
+        "steps": [
+            {
+                "type": "action", "onoff": false
+            },
+            {
+                "type": "feedback",
+                "led": { "r": 25, "g": 0, "b": 0, "flash": 1 },
+                "icon": { "icon": "thermometerDown", "flash": 1 },
+                "sounds": { "start": "bell" }
+            },
+            {
+                "type": "conditional",
+                "temperature": -75, "direction": "DOWN",
+                "delays": {
+                    "start": 0, "timeout": 60, "end": 3
+                },
+                "message": "Dropping ... wait ...",
+                "sounds": { "end": "bell" }
+            },
+            {
+                "type": "action", "onoff": true
+            },
+            {
+                "type": "feedback",
+                "led": { "r": 0, "g": 0, "b": 25, "flash": 1 },
+                "icon": { "icon": "drop", "flash": 1 }
+            },
+            {
+                "type": "conditional",
+                "temperature": -50, "direction": "UP",
+                "delays": { "start": 0, "timeout": 60, "end": 0 },
+                "message": "Start inhaling!"
+            },
+            {
+                "type": "action", "onoff": false
+            },
+            {
+                "type": "feedback",
+                "led": { "r": 0, "g": 0, "b": 25, "flash": 0 },
+                "icon": { "icon": "drop", "flash": 0 },
+                "delays": { "end": 15 }
+            },
+            {
+                "type": "feedback",
+                "led": { "r": 25, "g": 0, "b": 0, "flash": 0 },
+                "icon": { "icon": "cloud", "flash": 0 },
+                "sounds": { "end": "complete" }
+            },
+            {
+                "type": "conditional",
+                "temperature": -55, "direction": "DOWN",
+                "delays": { "start": 5, "timeout": 60, "end": 3 },
+                "message": "(Exhale ...)",
+                "sounds": { "end": "bell" }
+            },
+            {
+                "type": "action", "onoff": true,
+                "message": "Time to go again!"
+            },
+            {
+                "type": "feedback",
+                "led": { "r": 0, "g": 0, "b": 25, "flash": 1 },
+                "icon": { "icon": "drop", "flash": 1 }
+            },
+            {
+                "type": "conditional",
+                "temperature": 0, "direction": "UP",
+                "delays": { "start": 0, "timeout": 60, "end": 5 },
+                "message": "(Exhale ...)",
+                "sounds": { "end": "bell" }
+            },
+            {
+                "type": "feedback",
+                "icon": { "icon": "cloud", "flash": 1 },
+                "delays": { "end": 10 }
+            },
+            {
+                "type": "feedback",
+                "led": { "r": 0, "g": 25, "b": 0, "flash": 0 },
+                "icon": { "icon": "cloud", "flash": 0 },
+                "sounds": { "end": "complete" }
+            }
+        ]
+    },
+    {
+        "title": "VROD 90",
+        "steps": [
+            {
+                "type": "action", "onoff": false
+            },
+            {
+                "type": "feedback",
+                "led": { "r": 0, "g": 0, "b": 25, "flash": 1 },
+                "icon": { "icon": "drop", "flash": 1 },
+                "sounds": { "start": "bell" }
+            },
+            {
+                "type": "conditional",
+                "temperature": -90, "direction": "DOWN",
+                "delays": {
+                    "start": 0, "timeout": 60, "end": 3
+                },
+                "sounds": { "end": "bell" }
+            },
+            {
+                "type": "action", "onoff": true
+            },
+            {
+                "type": "conditional",
+                "temperature": -80, "direction": "UP",
+                "delays": { "start": 0, "timeout": 60, "end": 0 }
+            },
+            {
+                "type": "action", "onoff": false
+            },
+            {
+                "type": "feedback",
+                "led": { "r": 0, "g": 0, "b": 25, "flash": 0 },
+                "icon": { "icon": "cloud", "flash": 0 },
+                "delays": { "end": 15 },
+                "sounds": { "start": "complete" }
+            },
+            {
+                "type": "action", "onoff": true
+            },
+            {
+                "type": "feedback",
+                "led": { "r": 0, "g": 0, "b": 25, "flash": 0 },
+                "icon": { "icon": "drop", "flash": 0 },
+                "sounds": { "start": "bell" }
+            },
+            {
+                "type": "conditional",
+                "temperature": 0, "direction": "UP",
+                "delays": { "start": 5, "timeout": 60, "end": 3 },
+                "message": "Inhale :)",
+                "sounds": { "end": "bell" }
+            },
+            {
+                "type": "feedback",
+                "led": { "r": 0, "g": 10, "b": 0, "flash": 0 },
+                "icon": { "icon": "cloud", "flash": 0 },
+                "delays": { "end": 10 }
             }
         ]
     }

@@ -96,8 +96,41 @@ export class Profile {
         this.aborted = false;
         this.startTemp = this.temperature;
         this.startTime = Date.now();
-        this.steps[0].onEnd.subscribe(this.nextStep);
-        this.steps[0].beforeRun(this.steps[0].run.bind(this.steps[0].afterRun));
+
+        this.runStep(this.steps[0]);
+    }
+
+    runStep = (step: Step) => {
+        step.start()
+        .then((step: Step) => {
+            return this.running ? step.run(step) : Promise.reject('Step cancelled before run.');
+        })
+        .then((step: Step) => {
+            return this.running ? step.afterRun(step) : Promise.reject('Step cancelled before afterRun.');
+        })
+        .then((step: Step) => {
+            return this.running ? step.complete(step) : Promise.reject('Step cancelled before completing.');
+        }).then((step: Step) => {
+            if (!this.running) {
+                return Promise.reject('Step cancelled.  No more steps will be executed.');
+            }
+
+            this.currentIndex += 1;
+            if (this.currentIndex < this.steps.length) {
+                this._onNextStep.dispatch(this);
+                this.runStep(this.steps[this.currentIndex]);
+            } else {
+                this.currentIndex = 0;
+                this.running = false;
+                this.endTime = Date.now();
+                this.saveStatistics();
+                this._onEnd.dispatch(this);
+            }
+            
+            return Promise.resolve(step);
+        }).catch((reason) => {
+            console.log(`Step cancelled: ${reason}`);
+        });
     }
 
     abort = () => {
@@ -105,31 +138,6 @@ export class Profile {
             this.currentIndex = 0;
             this.aborted = true;
             this.running = false;
-            this._onEnd.dispatch(this);
-        }
-    }
-
-    nextStep = (step: Step) => {
-        if (!this.running) {
-            return;
-        }
-        
-        this._onNextStep.dispatch(this);
-        this.steps[this.currentIndex].onEnd.unsubscribe(this.nextStep);
-
-        this.currentIndex = this.currentIndex + 1;
-        if (this.currentIndex < this.steps.length) {
-            this.steps[this.currentIndex].onEnd.subscribe(this.nextStep);
-            this.steps[this.currentIndex].beforeRun(
-                this.steps[this.currentIndex].run.bind(
-                    this.steps[this.currentIndex].afterRun
-                )
-            );
-        } else {
-            this.currentIndex = 0;
-            this.running = false;
-            this.endTime = Date.now();
-            this.saveStatistics();
             this._onEnd.dispatch(this);
         }
     }

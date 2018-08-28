@@ -29,8 +29,11 @@ export class ActionStep extends Step {
         return this._step as IActionStep
     }
 
-    public run = (afterFunc: () => void) => {
-        this.profile.app.switchHeater(this.Step.onoff  === true ? 1 : 0);
-        afterFunc();
+    public run = (step: Step): Promise<Step> => {
+        return new Promise((resolve, reject) => {
+            this.profile.app.switchHeater(this.Step.onoff  === true ? 1 : 0);
+
+            resolve(this);
+        });
     }
 }
